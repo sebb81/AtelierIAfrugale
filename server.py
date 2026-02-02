@@ -1,17 +1,20 @@
-import base64
+﻿import base64
 import json
 from pathlib import Path
 
 import cv2
 import mediapipe as mp
 import numpy as np
-from fastapi import FastAPI, WebSocket, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, WebSocket, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
 FRONTEND_DIR = Path(__file__).resolve().parent / "frontend"
+TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
+
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(
@@ -26,15 +29,19 @@ app.mount("/static", StaticFiles(directory=FRONTEND_DIR, html=True), name="stati
 
 
 @app.get("/")
-def index():
-    return FileResponse(FRONTEND_DIR / "index.html")
+def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request, "page_id": "home"})
 
 
 @app.get("/mission{mission_id}")
-def mission_page(mission_id: int):
+def mission_page(request: Request, mission_id: int):
     if mission_id < 1 or mission_id > 5:
         raise HTTPException(status_code=404)
-    return FileResponse(FRONTEND_DIR / f"mission{mission_id}.html")
+    return templates.TemplateResponse(
+        "index.html",
+        {"request": request, "page_id": f"mission{mission_id}"},
+    )
+
 
 @app.websocket("/ws")
 async def ws_endpoint(ws: WebSocket):

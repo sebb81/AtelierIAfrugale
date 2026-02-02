@@ -1,0 +1,25 @@
+﻿<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Serious Game IA frugales</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body data-page="{{ page_id }}">
+  <div class="ambient" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <main class="shell">
+    {% include "partials/hero.html" %}
+    {% include "partials/nav.html" %}
+    {% include "partials/mission_grid.html" %}
+    {% include "partials/mission_cards.html" %}
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

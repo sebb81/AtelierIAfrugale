@@ -7,8 +7,6 @@ const stepBody = document.getElementById("step-body");
 const stepHint = document.getElementById("step-hint");
 const stepCounter = document.getElementById("step-counter");
 const progressBar = document.getElementById("progress-bar");
-const prevBtn = document.getElementById("prev-btn");
-const nextBtn = document.getElementById("next-btn");
 const gestureLabel = document.getElementById("gesture-label");
 const gestureConfidence = document.getElementById("gesture-confidence");
 const gestureFps = document.getElementById("gesture-fps");
@@ -22,7 +20,6 @@ const scoreTotalEl = document.getElementById("score-total");
 const missionActiveEl = document.getElementById("mission-active");
 const challengePanel = document.getElementById("challenge-panel");
 const badgeChips = Array.from(document.querySelectorAll(".badge-chip"));
-const missionMap = document.getElementById("mission-map");
 const heroTitle = document.getElementById("hero-title");
 const heroBody = document.getElementById("hero-body");
 const stageTitle = document.getElementById("stage-title");
@@ -402,30 +399,6 @@ function missionHref(id) {
   return `/${id}`;
 }
 
-function renderMissionMap() {
-  missionMap.innerHTML = "";
-  ALL_MISSIONS.forEach((mission) => {
-    const item = document.createElement("a");
-    item.classList.add("map-item");
-    item.href = missionHref(mission.id);
-    item.setAttribute("aria-label", mission.title);
-    if (mission.id !== currentPage.id) item.classList.add("locked");
-    if (badgeState[mission.id]) item.classList.add("done");
-    if (mission.id === currentPage.id) item.classList.add("active");
-
-    let statusText = "Bientot";
-    if (mission.id === currentPage.id) statusText = "Active";
-    if (badgeState[mission.id]) statusText = "Badge obtenu";
-
-    item.innerHTML = `
-      <div class="map-title">${mission.title}</div>
-      <div class="map-desc">${mission.desc}</div>
-      <div class="map-status">${statusText}</div>
-    `;
-    missionMap.appendChild(item);
-  });
-}
-
 function renderMissionCards() {
   if (!missionCards) return;
   if (currentPage.id !== "home") {
@@ -497,8 +470,6 @@ function renderStep() {
   stepCounter.textContent = `Etape ${currentStep + 1} / ${steps.length}`;
   const progress = ((currentStep + 1) / steps.length) * 100;
   progressBar.style.width = `${progress}%`;
-  prevBtn.disabled = currentStep === 0;
-  nextBtn.disabled = currentStep === steps.length - 1;
   missionActiveEl.textContent = step.title;
   const showChallenge = step.type === "gesture" && currentPage.usesCamera;
   challengePanel.hidden = !showChallenge;
@@ -508,24 +479,9 @@ function renderStep() {
       ? "Debloque"
       : `Objectif ${REQUIRED_THRESHOLD.toFixed(2)}`;
   }
-  renderMissionMap();
   updateBadges();
   renderMissionCards();
 }
-
-prevBtn.addEventListener("click", () => {
-  if (currentStep > 0) {
-    currentStep -= 1;
-    renderStep();
-  }
-});
-
-nextBtn.addEventListener("click", () => {
-  if (currentStep < steps.length - 1) {
-    currentStep += 1;
-    renderStep();
-  }
-});
 
 thresholdInput.addEventListener("input", () => {
   updateThresholdDisplay();
