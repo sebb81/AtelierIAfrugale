@@ -37,6 +37,7 @@ const kpiLabelFps = document.getElementById("kpi-label-fps");
 const navHome = document.getElementById("nav-home");
 const navPrev = document.getElementById("nav-prev");
 const navNext = document.getElementById("nav-next");
+const missionCards = document.getElementById("mission-cards");
 
 const pageId = document.body.dataset.page || "home";
 const REQUIRED_THRESHOLD = 0.75;
@@ -67,6 +68,39 @@ const ALL_MISSIONS = [
     id: "mission5",
     title: "Mission 5 - Audio",
     desc: "Reconnaissance vocale sobre."
+  }
+];
+
+const CARD_MISSIONS = [
+  {
+    id: "mission1",
+    label: "M1",
+    title: "Mission 1 - Geste frugal",
+    desc: "Detection pouce leve en local, ajuster le seuil."
+  },
+  {
+    id: "mission2",
+    label: "M2",
+    title: "Mission 2 - Emotion responsable",
+    desc: "Calibration emotionnelle sans modele lourd."
+  },
+  {
+    id: "mission3",
+    label: "M3",
+    title: "Mission 3 - Chatbot compact",
+    desc: "Assistant local et reponses utiles."
+  },
+  {
+    id: "mission4",
+    label: "M4",
+    title: "Mission 4 - RAG frugal",
+    desc: "Selectionner peu de documents pertinents."
+  },
+  {
+    id: "mission5",
+    label: "M5",
+    title: "Mission 5 - Audio sobre",
+    desc: "Reconnaissance vocale locale et legere."
   }
 ];
 
@@ -392,6 +426,33 @@ function renderMissionMap() {
   });
 }
 
+function renderMissionCards() {
+  if (!missionCards) return;
+  if (currentPage.id !== "home") {
+    missionCards.hidden = true;
+    return;
+  }
+  missionCards.hidden = false;
+  const grid = missionCards.querySelector(".mission-cards-grid");
+  if (!grid) return;
+  grid.innerHTML = "";
+  CARD_MISSIONS.forEach((mission) => {
+    const card = document.createElement("a");
+    card.classList.add("mission-tile");
+    card.href = missionHref(mission.id);
+    card.innerHTML = `
+      <div class="mission-tile-header">
+        <div class="mission-tile-icon">${mission.label}</div>
+        <h3 class="mission-tile-title">${mission.title}</h3>
+      </div>
+      <p class="mission-tile-desc">${mission.desc}</p>
+      <div class="mission-tile-status">Disponible</div>
+      <span class="mission-tile-button">Commencer</span>
+    `;
+    grid.appendChild(card);
+  });
+}
+
 function setNavState(link, href, label, enabled) {
   link.textContent = label;
   link.href = href || "#";
@@ -449,6 +510,7 @@ function renderStep() {
   }
   renderMissionMap();
   updateBadges();
+  renderMissionCards();
 }
 
 prevBtn.addEventListener("click", () => {
@@ -631,6 +693,7 @@ async function boot() {
   applyPageConfig();
   applyNavigation();
   renderStep();
+  renderMissionCards();
   if (!currentPage.usesCamera) return;
   try {
     setStatus("Demande d acces a la camera...");
