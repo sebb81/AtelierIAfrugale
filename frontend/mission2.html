@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Serious Game IA frugales</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body data-page="mission2">
+  <div class="ambient" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <main class="shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <div class="badge">Serious game</div>
+        <h1 id="hero-title">Serious Game IA frugales</h1>
+        <p id="hero-body">
+          Un parcours d experimentation autour des IA locales et sobres. Chaque mission
+          met en scene un arbitrage precision, latence et impact.
+        </p>
+        <div id="badge-row" class="badge-row">
+          <span class="chip badge-chip" data-badge="mission1">Vision locale</span>
+          <span class="chip badge-chip" data-badge="mission2">Emotion responsable</span>
+          <span class="chip badge-chip" data-badge="mission3">Chatbot compact</span>
+          <span class="chip badge-chip" data-badge="mission4">RAG frugal</span>
+          <span class="chip badge-chip" data-badge="mission5">Audio sobre</span>
+        </div>
+      </div>
+      <div class="hero-panel">
+        <div class="hero-metric">
+          <span>Score total</span>
+          <strong id="score-total">0/5</strong>
+        </div>
+        <div class="hero-metric">
+          <span>Mission active</span>
+          <strong id="mission-active">Briefing</strong>
+        </div>
+        <div class="hero-metric">
+          <span>Mode</span>
+          <strong>Local uniquement</strong>
+        </div>
+      </div>
+    </header>
+
+    <nav class="mission-nav">
+      <a id="nav-home" class="nav-link" href="/">Accueil</a>
+      <div class="nav-links">
+        <a id="nav-prev" class="nav-link ghost" href="#">Mission precedente</a>
+        <a id="nav-next" class="nav-link primary" href="#">Mission suivante</a>
+      </div>
+    </nav>
+
+    <section class="grid">
+      <section class="stage-card">
+        <div class="stage-header">
+          <div>
+            <h2 id="stage-title">Atelier vision locale</h2>
+            <p id="stage-desc">Detection mains en direct. Rien ne sort de la machine.</p>
+          </div>
+          <div id="status" class="status">Initialisation...</div>
+        </div>
+        <div id="stage-media" class="stage-media">
+          <div class="stack">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="overlay"></canvas>
+          </div>
+        </div>
+        <div id="stage-placeholder" class="stage-placeholder" hidden>
+          <h3>Module en preparation</h3>
+          <p>Cette mission utilise un autre capteur ou un autre type de modele.</p>
+        </div>
+        <div class="stage-footer">
+          <div class="stage-kpi">
+            <span id="kpi-label-gesture">Geste detecte</span>
+            <strong id="gesture-label">En attente</strong>
+          </div>
+          <div class="stage-kpi">
+            <span id="kpi-label-confidence">Confiance</span>
+            <strong id="gesture-confidence">0.00</strong>
+          </div>
+          <div class="stage-kpi">
+            <span id="kpi-label-fps">FPS</span>
+            <strong id="gesture-fps">0</strong>
+          </div>
+        </div>
+      </section>
+
+      <aside class="mission-card">
+        <div class="mission-header">
+          <div>
+            <h2 id="mission-title">Briefing de mission</h2>
+            <p id="mission-subtitle">Serious game IA frugale : missions courtes, badges a debloquer.</p>
+          </div>
+          <div class="progress-meta">
+            <span id="step-counter">Etape 1 / 1</span>
+          </div>
+        </div>
+        <div class="progress-bar">
+          <span id="progress-bar" class="progress-fill"></span>
+        </div>
+        <div class="mission-body">
+          <h3 id="step-title"></h3>
+          <p id="step-body"></p>
+          <p id="step-hint" class="hint"></p>
+        </div>
+        <div class="mission-challenge" id="challenge-panel">
+          <div class="slider-row">
+            <label for="threshold">Seuil de confiance</label>
+            <input id="threshold" type="range" min="0" max="1" step="0.01" value="0.6" />
+            <span id="threshold-value">0.60</span>
+          </div>
+          <div class="stat-grid">
+            <div class="stat">
+              <span>Score geste</span>
+              <strong id="gesture-score">0.00</strong>
+            </div>
+            <div class="stat">
+              <span>Reconnaissance</span>
+              <strong id="gesture-status">En attente</strong>
+            </div>
+            <div class="stat">
+              <span>Meilleur seuil</span>
+              <strong id="best-threshold">0.00</strong>
+            </div>
+            <div class="stat">
+              <span>Badge</span>
+              <strong id="badge-state">Verrouille</strong>
+            </div>
+          </div>
+        </div>
+        <div class="mission-actions">
+          <button id="prev-btn" class="ghost">Etape precedente</button>
+          <button id="next-btn" class="primary">Etape suivante</button>
+        </div>
+        <div class="mission-map">
+          <h4>Carte des missions</h4>
+          <div id="mission-map" class="map-list"></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

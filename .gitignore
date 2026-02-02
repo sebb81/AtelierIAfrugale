@@ -1,0 +1,4 @@
+# === Python ===
+.venv/
+python/
+__pycache__/
