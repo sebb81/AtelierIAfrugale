@@ -171,13 +171,13 @@ export const PAGE_CONFIG = {
     wsEndpoint: "/ws/emotion",
     showMpControls: false,
     challenge: true,
-    defaultThreshold: 0.43,
+    defaultThreshold: 0.38,
     threshold: {
       label: "Seuil de sourire",
-      min: 0.35,
+      min: 0.3,
       max: 0.6,
       step: 0.01,
-      value: 0.43
+      value: 0.38
     },
     statLabels: {
       score: "Smile ratio",

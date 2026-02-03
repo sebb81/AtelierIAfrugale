@@ -14,7 +14,7 @@ export function connectWebSocket() {
   const off = document.createElement("canvas");
   const offCtx = off.getContext("2d");
 
-  const sendWidth = 480;
+  const sendWidth = currentPage.id === "mission2" ? 640 : 480;
   const sendHeight = dom.video
     ? Math.round((sendWidth * dom.video.videoHeight) / dom.video.videoWidth)
     : 0;
