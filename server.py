@@ -55,6 +55,24 @@ EMOTION_MOUTH_OPEN_SURPRISE = 0.08
 EMOTION_CORNER_SMILE = -0.005
 EMOTION_CORNER_SAD = 0.012
 
+LLM_BASE_URL = "http://localhost:8033/v1"
+LLM_CHAT_ENDPOINT = f"{LLM_BASE_URL}/chat/completions"
+LLM_MODEL = "mistral"
+LLM_TIMEOUT = 30
+LLM_SYSTEM_PROMPT = (
+    "Tu es un assistant IA local. Reponds en francais, de maniere claire et "
+    "structuree. Si l'utilisateur demande du code, donne un exemple minimal et "
+    "correct."
+)
+LLM_DEFAULT_PARAMS = {
+    "temperature": 0.3,
+    "top_p": 0.9,
+    "presence_penalty": 0.6,
+    "frequency_penalty": 1.5,
+    "max_tokens": 768,
+}
+LLM_MAX_MESSAGES = 20
+
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
@@ -203,6 +221,41 @@ def _estimate_emotion(landmarks) -> tuple[str, dict]:
     return label, metrics
 
 
+def _normalize_chat_messages(messages) -> list[dict]:
+    if not messages:
+        return []
+    normalized = []
+    for msg in messages:
+        if not isinstance(msg, dict):
+            continue
+        role = str(msg.get("role", "")).lower()
+        if role not in {"user", "assistant"}:
+            continue
+        content = str(msg.get("content", "")).strip()
+        if not content:
+            continue
+        normalized.append({"role": role, "content": content})
+    return normalized
+
+
+def _call_llm_chat(system_prompt: str, messages: list[dict]) -> dict:
+    payload = {
+        "model": LLM_MODEL,
+        "messages": [{"role": "system", "content": system_prompt}] + messages,
+        "stream": False,
+    }
+    payload.update(LLM_DEFAULT_PARAMS)
+    body = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        LLM_CHAT_ENDPOINT,
+        data=body,
+        headers={"Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(req, timeout=LLM_TIMEOUT) as response:
+        data = response.read()
+    return json.loads(data)
+
+
 @app.get("/")
 def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "page_id": "home"})
@@ -216,6 +269,35 @@ def mission_page(request: Request, mission_id: int):
         "index.html",
         {"request": request, "page_id": f"mission{mission_id}"},
     )
+
+
+@app.post("/api/chat")
+async def chat(payload: dict):
+    system_prompt = str(payload.get("system_prompt") or LLM_SYSTEM_PROMPT)
+    messages = _normalize_chat_messages(payload.get("messages"))
+    if len(messages) > LLM_MAX_MESSAGES:
+        messages = messages[-LLM_MAX_MESSAGES:]
+    if not messages:
+        raise HTTPException(status_code=400, detail="Aucun message a traiter.")
+    try:
+        data = _call_llm_chat(system_prompt, messages)
+    except Exception:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "Impossible de contacter le serveur llama.cpp. "
+                f"Verifiez {LLM_CHAT_ENDPOINT}."
+            ),
+        )
+    try:
+        reply = data["choices"][0]["message"]["content"]
+    except Exception:
+        raise HTTPException(status_code=502, detail="Reponse LLM invalide.")
+    return {
+        "reply": reply,
+        "model": data.get("model"),
+        "usage": data.get("usage"),
+    }
 
 
 @app.websocket("/ws")

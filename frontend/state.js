@@ -17,5 +17,7 @@ export const state = {
   holdFrames: 0,
   lastMessageAt: null,
   fps: 0,
-  wsRef: null
+  wsRef: null,
+  chatMessages: [],
+  chatBusy: false
 };

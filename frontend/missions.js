@@ -210,7 +210,7 @@ export const PAGE_CONFIG = {
     heroBody:
       "Un assistant local, rapide, et assez bon pour le quotidien. La valeur d usage avant la taille du modele.",
     stageTitle: "Atelier chatbot",
-    stageDesc: "Prototype texte : pas de camera ici.",
+    stageDesc: "Prototype texte local via un serveur llama.cpp.",
     missionTitle: "Briefing chatbot",
     missionSubtitle: "Composer des reponses utiles avec un modele compact.",
     placeholderTitle: "Mode texte",
@@ -221,6 +221,11 @@ export const PAGE_CONFIG = {
       fps: "Latence"
     },
     usesCamera: false,
+    showChat: true,
+    chatEndpoint: "/api/chat",
+    chatSystemPrompt:
+      "Tu es un assistant IA local. Reponds en francais, de maniere claire et structuree. Si l'utilisateur demande du code, donne un exemple minimal et correct.",
+    chatPlaceholder: "Posez votre question...",
     defaultThreshold: 0.6,
     steps: [
       {

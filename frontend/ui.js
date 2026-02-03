@@ -26,8 +26,10 @@ export function applyPageConfig() {
   if (dom.kpiLabelFps) dom.kpiLabelFps.textContent = currentPage.kpiLabels.fps;
 
   if (dom.stageMedia) dom.stageMedia.hidden = !currentPage.usesCamera;
+  if (dom.chatPanel) dom.chatPanel.hidden = !currentPage.showChat;
   if (dom.stagePlaceholder) {
-    dom.stagePlaceholder.hidden = currentPage.usesCamera;
+    const showPlaceholder = !currentPage.usesCamera && !currentPage.showChat;
+    dom.stagePlaceholder.hidden = !showPlaceholder;
     const placeholderTitle = dom.stagePlaceholder.querySelector("h3");
     const placeholderBody = dom.stagePlaceholder.querySelector("p");
     if (placeholderTitle) placeholderTitle.textContent = currentPage.placeholderTitle;
@@ -67,7 +69,11 @@ export function applyPageConfig() {
   if (dom.statLabelBadge) dom.statLabelBadge.textContent = statLabels.badge;
 
   if (!currentPage.usesCamera) {
-    setStatus("Module sans camera");
+    if (currentPage.showChat) {
+      setStatus("Chatbot local pret");
+    } else {
+      setStatus("Module sans camera");
+    }
     if (dom.gestureLabel) dom.gestureLabel.textContent = "N/A";
     if (dom.gestureConfidence) dom.gestureConfidence.textContent = "0.00";
     if (dom.gestureFps) dom.gestureFps.textContent = "0";

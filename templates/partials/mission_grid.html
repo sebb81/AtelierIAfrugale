@@ -27,6 +27,24 @@
         </div>
       </div>
     </div>
+    <div id="chat-panel" class="chat-panel" hidden>
+      <div class="chat-controls">
+        <div class="chat-prompt">
+          <label for="chat-system">Prompt systeme</label>
+          <textarea id="chat-system" rows="3"></textarea>
+        </div>
+        <div class="chat-buttons">
+          <button id="chat-reset" class="ghost" type="button">Reinitialiser</button>
+          <button id="chat-clear" class="ghost" type="button">Effacer</button>
+        </div>
+      </div>
+      <div id="chat-log" class="chat-log"></div>
+      <form id="chat-form" class="chat-form">
+        <textarea id="chat-input" rows="2" placeholder="Posez votre question..."></textarea>
+        <button id="chat-send" class="primary" type="submit">Envoyer</button>
+      </form>
+      <p id="chat-status" class="chat-status" hidden></p>
+    </div>
     <div id="stage-placeholder" class="stage-placeholder" hidden>
       <h3>Module en preparation</h3>
       <p>Cette mission utilise un autre capteur ou un autre type de modele.</p>

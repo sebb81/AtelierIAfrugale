@@ -3,6 +3,7 @@ import { bindConfigControls } from "./config.js";
 import { currentPage } from "./state.js";
 import { setupCamera } from "./camera.js";
 import { connectWebSocket } from "./ws.js";
+import { setupChat } from "./chat.js";
 
 async function boot() {
   applyPageConfig();
@@ -10,6 +11,7 @@ async function boot() {
   renderStep();
   renderMissionCards();
   bindConfigControls();
+  setupChat();
   if (!currentPage.usesCamera) return;
   try {
     setStatus("Demande d acces a la camera...");
