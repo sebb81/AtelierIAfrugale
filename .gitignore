@@ -2,3 +2,4 @@
 .venv/
 python/
 __pycache__/
+missions/

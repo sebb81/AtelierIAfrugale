@@ -13,6 +13,20 @@
         <canvas id="overlay"></canvas>
       </div>
     </div>
+    <div id="gesture-readout" class="gesture-readout" hidden>
+      <div class="gesture-time">
+        Inference time (ms): <strong id="inference-time">0.0</strong>
+      </div>
+      <div class="gesture-bar">
+        <div class="gesture-bar-labels">
+          <span id="gesture-bar-name">Aucune main</span>
+          <span id="gesture-bar-score">0%</span>
+        </div>
+        <div class="gesture-bar-track">
+          <span id="gesture-bar-fill"></span>
+        </div>
+      </div>
+    </div>
     <div id="stage-placeholder" class="stage-placeholder" hidden>
       <h3>Module en preparation</h3>
       <p>Cette mission utilise un autre capteur ou un autre type de modele.</p>
@@ -61,6 +75,45 @@
           <strong id="badge-state">Verrouille</strong>
         </div>
       </div>
+    </div>
+    <div id="gesture-controls" class="gesture-controls" hidden>
+      <h3>Parametres MediaPipe</h3>
+      <div class="control-grid">
+        <!-- <div class="control-row select-row">
+          <label for="delegate-select">Inference delegate</label>
+          <select id="delegate-select">
+            <option value="cpu">CPU inference</option>
+            <option value="gpu">GPU inference</option>
+          </select>
+        </div>
+        <div class="control-row select-row">
+          <label for="model-select">Model selections</label>
+          <select id="model-select">
+            <option value="gesture_recognizer">MP Hand Gesture Classifier</option>
+          </select>
+        </div> -->
+        <div class="control-row range-row">
+          <label for="num-hands">Demo num hands</label>
+          <input id="num-hands" type="range" min="1" max="2" step="1" value="1" />
+          <span id="num-hands-value">1</span>
+        </div>
+        <div class="control-row range-row">
+          <label for="min-detection">Minimum hand detection confidence</label>
+          <input id="min-detection" type="range" min="0" max="1" step="0.01" value="0.5" />
+          <span id="min-detection-value">50%</span>
+        </div>
+        <div class="control-row range-row">
+          <label for="min-presence">Minimum hand presence confidence</label>
+          <input id="min-presence" type="range" min="0" max="1" step="0.01" value="0.5" />
+          <span id="min-presence-value">50%</span>
+        </div>
+        <div class="control-row range-row">
+          <label for="min-tracking">Minimum tracking confidence</label>
+          <input id="min-tracking" type="range" min="0" max="1" step="0.01" value="0.5" />
+          <span id="min-tracking-value">50%</span>
+        </div>
+      </div>
+      <p id="config-warning" class="control-warning" hidden></p>
     </div>
   </aside>
 </section>
