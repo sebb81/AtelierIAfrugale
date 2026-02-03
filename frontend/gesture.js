@@ -85,7 +85,6 @@ function scoreThumbUp(hand) {
 
 export function updateMissionProgress(isValid, score) {
   if (!currentPage.usesCamera || currentPage.id !== "mission1") return;
-  if (state.steps[state.currentStep]?.id !== "mission1") return;
 
   if (isValid) {
     state.holdFrames += 1;

@@ -34,12 +34,37 @@ export function applyPageConfig() {
     if (placeholderBody) placeholderBody.textContent = currentPage.placeholderBody;
   }
   if (dom.gestureReadout) dom.gestureReadout.hidden = !currentPage.usesCamera;
-  if (dom.gestureControls) dom.gestureControls.hidden = !currentPage.usesCamera;
+  if (dom.gestureControls) {
+    dom.gestureControls.hidden = !(currentPage.usesCamera && currentPage.showMpControls);
+  }
 
+  const thresholdConfig = currentPage.threshold || {
+    label: "Seuil de confiance",
+    min: 0,
+    max: 1,
+    step: 0.01,
+    value: currentPage.defaultThreshold ?? 0.6
+  };
   if (dom.thresholdInput) {
-    dom.thresholdInput.value = currentPage.defaultThreshold;
+    dom.thresholdInput.min = thresholdConfig.min;
+    dom.thresholdInput.max = thresholdConfig.max;
+    dom.thresholdInput.step = thresholdConfig.step;
+    dom.thresholdInput.value = thresholdConfig.value;
     updateThresholdDisplay();
   }
+  if (dom.thresholdLabel) {
+    dom.thresholdLabel.textContent = thresholdConfig.label || "Seuil de confiance";
+  }
+  const statLabels = currentPage.statLabels || {
+    score: "Score geste",
+    status: "Reconnaissance",
+    best: "Meilleur seuil",
+    badge: "Badge"
+  };
+  if (dom.statLabelScore) dom.statLabelScore.textContent = statLabels.score;
+  if (dom.statLabelStatus) dom.statLabelStatus.textContent = statLabels.status;
+  if (dom.statLabelBest) dom.statLabelBest.textContent = statLabels.best;
+  if (dom.statLabelBadge) dom.statLabelBadge.textContent = statLabels.badge;
 
   if (!currentPage.usesCamera) {
     setStatus("Module sans camera");
@@ -48,7 +73,9 @@ export function applyPageConfig() {
     if (dom.gestureFps) dom.gestureFps.textContent = "0";
     showConfigWarning(null);
   } else {
-    applyConfigToUI(DEFAULT_MP_CONFIG);
+    if (currentPage.showMpControls) {
+      applyConfigToUI(DEFAULT_MP_CONFIG);
+    }
     showConfigWarning(null);
   }
 }
@@ -147,14 +174,19 @@ export function renderStep() {
     dom.progressBar.style.width = `${progress}%`;
   }
   if (dom.missionActiveEl) dom.missionActiveEl.textContent = step.title;
-  const showChallenge = step.type === "gesture" && currentPage.usesCamera;
+  const showChallenge = Boolean(currentPage.challenge && currentPage.usesCamera);
   if (dom.challengePanel) dom.challengePanel.hidden = !showChallenge;
-  if (step.id === "mission1") {
+  if (currentPage.id === "mission1") {
     if (dom.bestThresholdEl) dom.bestThresholdEl.textContent = state.bestThreshold.toFixed(2);
     if (dom.badgeStateEl) {
       dom.badgeStateEl.textContent = state.badgeState.mission1
         ? "Debloque"
         : `Objectif ${REQUIRED_THRESHOLD.toFixed(2)}`;
+    }
+  } else if (currentPage.id === "mission2") {
+    if (dom.bestThresholdEl) dom.bestThresholdEl.textContent = state.bestThreshold.toFixed(2);
+    if (dom.badgeStateEl) {
+      dom.badgeStateEl.textContent = state.badgeState.mission2 ? "Debloque" : "Verrouille";
     }
   }
   updateBadges();

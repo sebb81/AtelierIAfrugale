@@ -1,12 +1,14 @@
 import { dom } from "./dom.js";
-import { state } from "./state.js";
+import { currentPage, state } from "./state.js";
 import { setStatus } from "./ui.js";
 import { applyConfigToUI, sendConfig, showConfigWarning } from "./config.js";
 import { drawLandmarks, updateGestureMetrics, updateInferenceTime } from "./gesture.js";
+import { drawFaceGuides, updateEmotionMetrics } from "./emotion.js";
 
 export function connectWebSocket() {
   const protocol = location.protocol === "https:" ? "wss" : "ws";
-  const ws = new WebSocket(`${protocol}://${location.host}/ws`);
+  const endpoint = currentPage.wsEndpoint || "/ws";
+  const ws = new WebSocket(`${protocol}://${location.host}${endpoint}`);
   state.wsRef = ws;
 
   const off = document.createElement("canvas");
@@ -24,7 +26,9 @@ export function connectWebSocket() {
 
   ws.addEventListener("open", () => {
     setStatus("Streaming actif", true);
-    sendConfig();
+    if (currentPage.showMpControls) {
+      sendConfig();
+    }
     timerId = setInterval(() => {
       if (ws.readyState !== WebSocket.OPEN) return;
       if (!dom.video) return;
@@ -54,6 +58,12 @@ export function connectWebSocket() {
     }
     if (msg.error) {
       setStatus(msg.error);
+      return;
+    }
+    if (msg.type === "emotion") {
+      drawFaceGuides(msg.guides);
+      updateEmotionMetrics(msg);
+      updateInferenceTime(msg.metrics);
       return;
     }
     drawLandmarks(msg.landmarks);

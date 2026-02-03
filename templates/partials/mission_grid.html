@@ -53,25 +53,25 @@
     </div>
     <div class="mission-challenge" id="challenge-panel">
       <div class="slider-row">
-        <label for="threshold">Seuil de confiance</label>
+        <label id="threshold-label" for="threshold">Seuil de confiance</label>
         <input id="threshold" type="range" min="0" max="1" step="0.01" value="0.6" />
         <span id="threshold-value">0.60</span>
       </div>
       <div class="stat-grid">
         <div class="stat">
-          <span>Score geste</span>
+          <span id="stat-label-score">Score geste</span>
           <strong id="gesture-score">0.00</strong>
         </div>
         <div class="stat">
-          <span>Reconnaissance</span>
+          <span id="stat-label-status">Reconnaissance</span>
           <strong id="gesture-status">En attente</strong>
         </div>
         <div class="stat">
-          <span>Meilleur seuil</span>
+          <span id="stat-label-best">Meilleur seuil</span>
           <strong id="best-threshold">0.00</strong>
         </div>
         <div class="stat">
-          <span>Badge</span>
+          <span id="stat-label-badge">Badge</span>
           <strong id="badge-state">Verrouille</strong>
         </div>
       </div>

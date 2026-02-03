@@ -106,7 +106,23 @@ export const PAGE_CONFIG = {
       fps: "FPS"
     },
     usesCamera: true,
+    wsEndpoint: "/ws",
+    showMpControls: true,
+    challenge: true,
     defaultThreshold: 0.6,
+    threshold: {
+      label: "Seuil de confiance",
+      min: 0,
+      max: 1,
+      step: 0.01,
+      value: 0.6
+    },
+    statLabels: {
+      score: "Score geste",
+      status: "Reconnaissance",
+      best: "Meilleur seuil",
+      badge: "Badge"
+    },
     steps: [
       {
         id: "intro",
@@ -141,25 +157,41 @@ export const PAGE_CONFIG = {
     heroBody:
       "Observer une emotion sans sur-consommer. On joue sur la precision percue et la sobriete du modele.",
     stageTitle: "Atelier emotion",
-    stageDesc: "Prototype sans camera : scenario de calibration emotionnelle.",
+    stageDesc: "Face mesh en direct pour lire une nuance emotionnelle.",
     missionTitle: "Briefing emotion",
     missionSubtitle: "Comprendre les limites, la contextuelle, et la sobriete.",
     placeholderTitle: "Capteur alternatif",
     placeholderBody: "Module emotion en preparation. Utilise un flux de donnees pre-enregistre.",
     kpiLabels: {
-      gesture: "Signal",
-      confidence: "Qualite",
-      fps: "Latence"
+      gesture: "Emotion",
+      confidence: "Smile ratio",
+      fps: "FPS"
     },
-    usesCamera: false,
-    defaultThreshold: 0.6,
+    usesCamera: true,
+    wsEndpoint: "/ws/emotion",
+    showMpControls: false,
+    challenge: true,
+    defaultThreshold: 0.43,
+    threshold: {
+      label: "Seuil de sourire",
+      min: 0.35,
+      max: 0.6,
+      step: 0.01,
+      value: 0.43
+    },
+    statLabels: {
+      score: "Smile ratio",
+      status: "Emotion",
+      best: "Meilleur seuil",
+      badge: "Badge"
+    },
     steps: [
       {
         id: "mission2",
         title: "Mission 2 - Emotion responsable",
         body:
           "Scenario : une conseillere bancaire adapte son discours a l humeur du client. Tu dois limiter la complexite du modele.",
-        hint: "Defi : garder une detection stable sans modele lourd.",
+        hint: "Defi : ajuster le seuil de sourire sans fausse detection.",
         type: "info"
       },
       {

@@ -76,7 +76,7 @@ export function showConfigWarning(message) {
 }
 
 export function sendConfig() {
-  if (!currentPage.usesCamera) return;
+  if (!currentPage.usesCamera || !currentPage.showMpControls) return;
   const payload = readConfigFromUI();
   if (state.wsRef && state.wsRef.readyState === WebSocket.OPEN) {
     state.wsRef.send(JSON.stringify({ type: "config", config: payload }));
