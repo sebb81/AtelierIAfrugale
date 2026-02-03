@@ -27,6 +27,32 @@
         </div>
       </div>
     </div>
+    <div id="audio-panel" class="audio-panel" hidden>
+      <div class="audio-controls">
+        <div class="audio-row">
+          <label for="audio-language">Langue</label>
+          <select id="audio-language">
+            <option value="fr">Francais</option>
+            <option value="en">Anglais</option>
+            <option value="es">Espagnol</option>
+            <option value="de">Allemand</option>
+            <option value="it">Italien</option>
+          </select>
+        </div>
+        <div class="audio-row audio-actions">
+          <button id="audio-record" class="primary" type="button">Enregistrer</button>
+          <button id="audio-stop" class="ghost" type="button" disabled>Stop</button>
+          <button id="audio-clear" class="ghost" type="button">Effacer les essais</button>
+        </div>
+        <p id="audio-status" class="audio-status" hidden></p>
+      </div>
+      <audio id="audio-playback" class="audio-playback" controls hidden></audio>
+      <div id="audio-attempts" class="audio-attempts"></div>
+      <div id="audio-feedback" class="audio-feedback" hidden>
+        <div class="audio-feedback-title">Feedback</div>
+        <div id="audio-feedback-body" class="audio-feedback-body"></div>
+      </div>
+    </div>
     <div id="chat-panel" class="chat-panel" hidden>
       <div class="chat-controls">
         <div class="chat-prompt">

@@ -4,6 +4,7 @@ import { currentPage } from "./state.js";
 import { setupCamera } from "./camera.js";
 import { connectWebSocket } from "./ws.js";
 import { setupChat } from "./chat.js";
+import { setupAudio } from "./audio.js";
 
 async function boot() {
   applyPageConfig();
@@ -12,6 +13,7 @@ async function boot() {
   renderMissionCards();
   bindConfigControls();
   setupChat();
+  setupAudio();
   if (!currentPage.usesCamera) return;
   try {
     setStatus("Demande d acces a la camera...");

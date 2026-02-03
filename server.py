@@ -1,7 +1,9 @@
 ﻿import base64
 import json
 import math
+import os
 import platform
+import tempfile
 import threading
 import time
 import urllib.request
@@ -97,6 +99,13 @@ RAG_STORE = {
 }
 RAG_LOCK = threading.Lock()
 _EMBEDDING_MODEL = None
+
+ASR_VARIANT = "tiny"
+ASR_DEFAULT_LANGUAGE = "fr"
+ASR_SUPPORTED_LANGUAGES = {"fr", "en", "es", "de", "it"}
+ASR_TARGET_SAMPLE_RATE = 16000
+ASR_LOCK = threading.Lock()
+_ASR_BACKEND = None
 
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
@@ -435,6 +444,74 @@ def _build_context_block(results):
     return "\n".join(lines)
 
 
+def _get_asr_backend():
+    global _ASR_BACKEND
+    if _ASR_BACKEND is not None:
+        return _ASR_BACKEND
+    with ASR_LOCK:
+        if _ASR_BACKEND is not None:
+            return _ASR_BACKEND
+        try:
+            import whisper  # type: ignore
+
+            model = whisper.load_model(ASR_VARIANT)
+            _ASR_BACKEND = ("whisper", model)
+            return _ASR_BACKEND
+        except Exception:
+            pass
+
+        try:
+            from transformers import pipeline  # type: ignore
+
+            asr = pipeline(
+                "automatic-speech-recognition",
+                model=f"openai/whisper-{ASR_VARIANT}",
+                device="cpu",
+            )
+            _ASR_BACKEND = ("transformers", asr)
+            return _ASR_BACKEND
+        except Exception as exc:
+            _ASR_BACKEND = ("none", str(exc))
+            return _ASR_BACKEND
+
+
+def _transcribe_audio_bytes(audio_bytes: bytes, language: str, suffix: str = ".wav"):
+    backend_name, backend = _get_asr_backend()
+    if backend_name == "none":
+        return None, (
+            "Aucun backend Whisper local disponible.\n\n"
+            "Installez l'un des deux:\n"
+            "- `pip install -U openai-whisper`\n"
+            "ou\n"
+            "- `pip install -U transformers accelerate` (et torch)\n\n"
+            f"Detail: {backend}"
+        )
+
+    tmp_path = None
+    try:
+        fd, tmp_path = tempfile.mkstemp(suffix=suffix)
+        os.close(fd)
+        with open(tmp_path, "wb") as handle:
+            handle.write(audio_bytes)
+
+        if backend_name == "whisper":
+            result = backend.transcribe(tmp_path, language=language, fp16=False)
+            text = (result.get("text") or "").strip()
+            return text, None
+
+        out = backend(tmp_path, generate_kwargs={"language": language})
+        text = (out.get("text") if isinstance(out, dict) else str(out)).strip()
+        return text, None
+    except Exception as exc:
+        return None, f"Erreur de transcription: {exc}"
+    finally:
+        if tmp_path and os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except Exception:
+                pass
+
+
 @app.get("/")
 def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "page_id": "home"})
@@ -624,6 +701,28 @@ async def rag_chat(payload: dict):
         "model": data.get("model"),
         "usage": data.get("usage"),
     }
+
+
+@app.post("/api/audio/transcribe")
+async def audio_transcribe(
+    file: UploadFile = File(...),
+    language: str = Form(ASR_DEFAULT_LANGUAGE),
+):
+    if not file or not file.filename:
+        raise HTTPException(status_code=400, detail="Aucun fichier audio fourni.")
+    audio_bytes = await file.read()
+    if not audio_bytes:
+        raise HTTPException(status_code=400, detail="Fichier audio vide.")
+
+    lang = (language or ASR_DEFAULT_LANGUAGE).lower()
+    if lang not in ASR_SUPPORTED_LANGUAGES:
+        lang = ASR_DEFAULT_LANGUAGE
+
+    suffix = Path(file.filename).suffix or ".wav"
+    text, err = _transcribe_audio_bytes(audio_bytes, lang, suffix=suffix)
+    if err:
+        raise HTTPException(status_code=503, detail=err)
+    return {"text": text or "", "language": lang}
 
 
 @app.websocket("/ws")

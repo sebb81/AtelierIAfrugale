@@ -19,5 +19,6 @@ export const state = {
   fps: 0,
   wsRef: null,
   chatMessages: [],
-  chatBusy: false
+  chatBusy: false,
+  audioAttempts: []
 };

@@ -304,7 +304,7 @@ export const PAGE_CONFIG = {
     heroBody:
       "Reconnaissance vocale locale, sans streaming. On accepte un peu d erreur pour baisser l empreinte.",
     stageTitle: "Atelier audio",
-    stageDesc: "Prototype micro : pas de flux video.",
+    stageDesc: "Micro local + Whisper Tiny pour jouer la concision.",
     missionTitle: "Briefing audio",
     missionSubtitle: "Garder un service utile avec un modele leger.",
     placeholderTitle: "Micro local",
@@ -315,14 +315,16 @@ export const PAGE_CONFIG = {
       fps: "Latence"
     },
     usesCamera: false,
+    showAudio: true,
+    audioEndpoint: "/api/audio/transcribe",
     defaultThreshold: 0.6,
     steps: [
       {
         id: "mission5",
         title: "Mission 5 - Audio sobre",
         body:
-          "Scenario : dicter une commande courte. Tu ajustes le modele pour limiter la consommation.",
-        hint: "Defi : reduire les erreurs sans augmenter la taille.",
+          "Scenario : dicter une phrase, puis la raccourcir en gardant le sens.",
+        hint: "Defi : 3 essais, de la phrase complete aux mots-cles.",
         type: "info"
       },
       {

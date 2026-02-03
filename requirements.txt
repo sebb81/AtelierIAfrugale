@@ -7,3 +7,6 @@ numpy
 sentence-transformers
 pymupdf
 python-multipart
+openai-whisper
+transformers
+accelerate

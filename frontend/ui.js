@@ -26,9 +26,11 @@ export function applyPageConfig() {
   if (dom.kpiLabelFps) dom.kpiLabelFps.textContent = currentPage.kpiLabels.fps;
 
   if (dom.stageMedia) dom.stageMedia.hidden = !currentPage.usesCamera;
+  if (dom.audioPanel) dom.audioPanel.hidden = !currentPage.showAudio;
   if (dom.chatPanel) dom.chatPanel.hidden = !currentPage.showChat;
   if (dom.stagePlaceholder) {
-    const showPlaceholder = !currentPage.usesCamera && !currentPage.showChat;
+    const showPlaceholder =
+      !currentPage.usesCamera && !currentPage.showChat && !currentPage.showAudio;
     dom.stagePlaceholder.hidden = !showPlaceholder;
     const placeholderTitle = dom.stagePlaceholder.querySelector("h3");
     const placeholderBody = dom.stagePlaceholder.querySelector("p");
@@ -69,7 +71,9 @@ export function applyPageConfig() {
   if (dom.statLabelBadge) dom.statLabelBadge.textContent = statLabels.badge;
 
   if (!currentPage.usesCamera) {
-    if (currentPage.showChat) {
+    if (currentPage.showAudio) {
+      setStatus("Audio local pret");
+    } else if (currentPage.showChat) {
       setStatus(currentPage.chatMode === "rag" ? "RAG local pret" : "Chatbot local pret");
     } else {
       setStatus("Module sans camera");
