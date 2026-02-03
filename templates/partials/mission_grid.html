@@ -38,11 +38,47 @@
           <button id="chat-clear" class="ghost" type="button">Effacer</button>
         </div>
       </div>
+      <div id="rag-controls" class="rag-controls" hidden>
+        <div class="rag-grid">
+          <div class="rag-field">
+            <label for="rag-files">Documents (PDF, TXT, MD)</label>
+            <input id="rag-files" type="file" multiple accept=".pdf,.txt,.md" />
+          </div>
+          <div class="rag-buttons">
+            <button id="rag-index" class="primary" type="button">Indexer</button>
+            <button id="rag-reset" class="ghost" type="button">Reinitialiser base</button>
+          </div>
+          <div class="rag-field">
+            <label for="rag-chunk-size">Taille des chunks</label>
+            <input id="rag-chunk-size" type="number" min="400" max="4000" step="100" value="1200" />
+          </div>
+          <div class="rag-field">
+            <label for="rag-overlap">Chevauchement</label>
+            <input id="rag-overlap" type="number" min="0" max="1000" step="50" value="200" />
+          </div>
+          <div class="rag-field">
+            <label for="rag-top-k">Top-K passages</label>
+            <input id="rag-top-k" type="number" min="1" max="20" step="1" value="6" />
+          </div>
+          <div class="rag-field">
+            <label for="rag-min-score">Score minimum</label>
+            <div class="rag-range">
+              <input id="rag-min-score" type="range" min="0" max="1" step="0.01" value="0.25" />
+              <span id="rag-min-score-value">0.25</span>
+            </div>
+          </div>
+        </div>
+        <div id="rag-counts" class="rag-counts">Chunks : 0 · Sources : 0</div>
+      </div>
       <div id="chat-log" class="chat-log"></div>
       <form id="chat-form" class="chat-form">
         <textarea id="chat-input" rows="2" placeholder="Posez votre question..."></textarea>
         <button id="chat-send" class="primary" type="submit">Envoyer</button>
       </form>
+      <div id="rag-sources" class="rag-sources" hidden>
+        <div class="rag-sources-header">Passages utilises</div>
+        <div id="rag-source-list" class="rag-source-list"></div>
+      </div>
       <p id="chat-status" class="chat-status" hidden></p>
     </div>
     <div id="stage-placeholder" class="stage-placeholder" hidden>

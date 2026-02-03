@@ -70,7 +70,7 @@ export function applyPageConfig() {
 
   if (!currentPage.usesCamera) {
     if (currentPage.showChat) {
-      setStatus("Chatbot local pret");
+      setStatus(currentPage.chatMode === "rag" ? "RAG local pret" : "Chatbot local pret");
     } else {
       setStatus("Module sans camera");
     }

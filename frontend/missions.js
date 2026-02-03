@@ -252,7 +252,7 @@ export const PAGE_CONFIG = {
     heroBody:
       "Limiter les documents, cibler les sources utiles, et garder la reponse locale.",
     stageTitle: "Atelier documents",
-    stageDesc: "Prototype RAG : index minimal, reponse rapide.",
+    stageDesc: "Prototype RAG local : indexation frugale et reponse guidee.",
     missionTitle: "Briefing RAG",
     missionSubtitle: "Prioriser l impact plutot que l exhaustivite.",
     placeholderTitle: "RAG local",
@@ -263,6 +263,21 @@ export const PAGE_CONFIG = {
       fps: "Index"
     },
     usesCamera: false,
+    showChat: true,
+    chatMode: "rag",
+    chatEndpoint: "/api/rag/chat",
+    ragStateEndpoint: "/api/rag/state",
+    ragIndexEndpoint: "/api/rag/index",
+    ragResetEndpoint: "/api/rag/reset",
+    ragConfig: {
+      chunkSize: 1200,
+      overlap: 200,
+      topK: 6,
+      minScore: 0.25
+    },
+    chatSystemPrompt:
+      "Tu es un assistant IA local. Tu dois repondre en francais. Si un CONTEXTE DOCUMENTAIRE est fourni, utilise-le en priorite et cite tes sources avec les numeros entre crochets (ex: [1], [2]). Si le contexte ne contient pas l'information, dis-le clairement et propose quoi chercher.",
+    chatPlaceholder: "Posez une question...",
     defaultThreshold: 0.6,
     steps: [
       {
