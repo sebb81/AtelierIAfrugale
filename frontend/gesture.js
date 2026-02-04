@@ -1,6 +1,6 @@
 import { dom } from "./dom.js";
 import { currentPage, state } from "./state.js";
-import { HOLD_FRAMES, REQUIRED_THRESHOLD } from "./constants.js";
+import { HOLD_FRAMES } from "./constants.js";
 import { updateBadges } from "./ui.js";
 
 export function drawLandmarks(landmarks) {
@@ -83,6 +83,77 @@ function scoreThumbUp(hand) {
   return { score, label };
 }
 
+function setMission1BadgeText() {
+  if (!dom.badgeStateEl) return;
+  dom.badgeStateEl.textContent = state.badgeState.mission1 ? "Debloque" : "Seuil raisonnable";
+}
+
+function renderMission1AcceptanceUI() {
+  if (currentPage.id !== "mission1") {
+    if (dom.confidenceAcceptancePanel) dom.confidenceAcceptancePanel.hidden = true;
+    return;
+  }
+
+  const accepted = state.mission1Decision.accepted;
+  const canAccept = state.mission1Decision.canAccept;
+  const showPanel = accepted || canAccept;
+
+  if (dom.confidenceAcceptancePanel) dom.confidenceAcceptancePanel.hidden = !showPanel;
+  if (dom.confidenceAcceptanceRow) dom.confidenceAcceptanceRow.hidden = !showPanel || accepted;
+
+  if (dom.confidenceAcceptanceCheckbox) {
+    dom.confidenceAcceptanceCheckbox.checked = accepted;
+    dom.confidenceAcceptanceCheckbox.disabled = accepted || !canAccept;
+  }
+
+  if (dom.confidenceAcceptanceSummary) {
+    dom.confidenceAcceptanceSummary.hidden = !accepted;
+  }
+
+  if (accepted) {
+    if (dom.acceptedThresholdEl) {
+      dom.acceptedThresholdEl.textContent = state.mission1Decision.acceptedThreshold.toFixed(2);
+    }
+    if (dom.acceptedConfidenceEl) {
+      dom.acceptedConfidenceEl.textContent = `~${state.mission1Decision.acceptedConfidence.toFixed(2)}`;
+    }
+  }
+}
+
+export function bindMission1AcceptanceControl() {
+  if (currentPage.id !== "mission1") return;
+  if (!dom.confidenceAcceptanceCheckbox) return;
+
+  if (dom.confidenceAcceptanceCheckbox.dataset.bound === "1") {
+    renderMission1AcceptanceUI();
+    return;
+  }
+
+  dom.confidenceAcceptanceCheckbox.dataset.bound = "1";
+  dom.confidenceAcceptanceCheckbox.addEventListener("change", () => {
+    if (!dom.confidenceAcceptanceCheckbox.checked) return;
+    if (!state.mission1Decision.canAccept) {
+      dom.confidenceAcceptanceCheckbox.checked = false;
+      return;
+    }
+
+    const threshold = dom.thresholdInput ? Number(dom.thresholdInput.value) : 0;
+    state.mission1Decision.accepted = true;
+    state.mission1Decision.acceptedThreshold = threshold;
+    state.mission1Decision.acceptedConfidence = state.mission1Decision.lastScore;
+
+    if (!state.badgeState.mission1) {
+      state.badgeState.mission1 = true;
+      updateBadges();
+    }
+
+    setMission1BadgeText();
+    renderMission1AcceptanceUI();
+  });
+
+  renderMission1AcceptanceUI();
+}
+
 export function updateMissionProgress(isValid, score) {
   if (!currentPage.usesCamera || currentPage.id !== "mission1") return;
 
@@ -100,17 +171,13 @@ export function updateMissionProgress(isValid, score) {
   if (dom.bestThresholdEl) {
     dom.bestThresholdEl.textContent = state.bestThreshold.toFixed(2);
   }
-  if (!state.badgeState.mission1 && state.bestThreshold >= REQUIRED_THRESHOLD) {
-    state.badgeState.mission1 = true;
-    if (dom.badgeStateEl) dom.badgeStateEl.textContent = "Debloque";
-    updateBadges();
-  }
 
-  if (dom.badgeStateEl) {
-    dom.badgeStateEl.textContent = state.badgeState.mission1
-      ? "Debloque"
-      : `Objectif ${REQUIRED_THRESHOLD.toFixed(2)}`;
-  }
+  const threshold = dom.thresholdInput ? Number(dom.thresholdInput.value) : 0;
+  state.mission1Decision.canAccept = isValid && score >= threshold;
+  state.mission1Decision.lastScore = score;
+
+  setMission1BadgeText();
+  renderMission1AcceptanceUI();
 
   if (dom.gestureScoreEl) dom.gestureScoreEl.textContent = score.toFixed(2);
 }

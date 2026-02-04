@@ -31,31 +31,31 @@ export const CARD_MISSIONS = [
     id: "mission1",
     label: "M1",
     title: "Mission 1 - Geste frugal",
-    desc: "Detection pouce leve en local, ajuster le seuil."
+    desc: "👉 Reconnaître un geste… sans viser la perfection."
   },
   {
     id: "mission2",
     label: "M2",
     title: "Mission 2 - Emotion responsable",
-    desc: "Calibration emotionnelle sans modele lourd."
+    desc: "👉 Accepter l’incertitude plutôt que surentraîner."
   },
   {
     id: "mission3",
     label: "M3",
     title: "Mission 3 - Chatbot compact",
-    desc: "Assistant local et reponses utiles."
+    desc: "👉 Un modèle plus petit peut-il suffire ?"
   },
   {
     id: "mission4",
     label: "M4",
     title: "Mission 4 - RAG frugal",
-    desc: "Selectionner peu de documents pertinents."
+    desc: "👉 Moins de documents, mais mieux choisis."
   },
   {
     id: "mission5",
     label: "M5",
     title: "Mission 5 - Audio sobre",
-    desc: "Reconnaissance vocale locale et legere."
+    desc: "👉 Reconnaissance vocale locale et legere."
   }
 ];
 
@@ -64,13 +64,13 @@ export const PAGE_CONFIG = {
     id: "home",
     heroTitle: "Serious Game IA frugales",
     heroBody:
-      "Choisis une mission et progresse dans le serious game. Chaque mission explore un arbitrage precision, latence et impact.",
+      "Choisis une mission et progresse dans le serious game. Chaque mission te confronte à un choix: faire mieux… ou faire plus simple.",
     stageTitle: "Bienvenue",
-    stageDesc: "Selectionne une mission pour commencer le parcours.",
+    stageDesc: "Ici, tu ne cherches pas la meilleure IA, mais la plus juste pour le besoin.",
     missionTitle: "Accueil",
     missionSubtitle: "Navigation libre entre missions.",
     placeholderTitle: "Choisir une mission",
-    placeholderBody: "Utilise la carte des missions pour naviguer.",
+    placeholderBody: "Chaque mission teste une manière différente de faire “juste assez”.",
     kpiLabels: {
       gesture: "Mission",
       confidence: "Etat",

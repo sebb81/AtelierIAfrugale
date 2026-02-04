@@ -14,6 +14,13 @@ export const state = {
   },
   currentStep: 0,
   bestThreshold: 0,
+  mission1Decision: {
+    canAccept: false,
+    accepted: false,
+    acceptedThreshold: 0,
+    acceptedConfidence: 0,
+    lastScore: 0
+  },
   holdFrames: 0,
   lastMessageAt: null,
   fps: 0,

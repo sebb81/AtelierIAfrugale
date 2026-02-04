@@ -3,7 +3,7 @@
     <div class="stage-header">
       <div>
         <h2 id="stage-title">Atelier vision locale</h2>
-        <p id="stage-desc">Detection mains en direct. Rien ne sort de la machine.</p>
+        <p id="stage-desc">Détection de gestes en local. L’objectif n’est pas la perfection, mais un seuil suffisant.</p>
       </div>
       <div id="status" class="status">Initialisation...</div>
     </div>
@@ -153,6 +153,18 @@
         <div class="stat">
           <span id="stat-label-badge">Badge</span>
           <strong id="badge-state">Verrouille</strong>
+        </div>
+      </div>
+      <div id="confidence-acceptance-panel" class="confidence-acceptance" hidden>
+        <label id="confidence-acceptance-row" class="confidence-checkbox-row" hidden>
+          <input id="confidence-acceptance-checkbox" type="checkbox" />
+          <span>Nous acceptons ce niveau de confiance pour ce besoin</span>
+        </label>
+        <div id="confidence-acceptance-summary" class="confidence-summary" hidden>
+          <div class="confidence-summary-title">Décision enregistrée</div>
+          <p>Seuil choisi : <strong id="accepted-threshold">0.00</strong></p>
+          <p>Confiance observée : <strong id="accepted-confidence">~0.00</strong></p>
+          <p>"Un autre contexte aurait pu conduire à un autre choix."</p>
         </div>
       </div>
     </div>

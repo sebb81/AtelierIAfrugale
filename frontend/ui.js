@@ -1,7 +1,7 @@
 import { dom } from "./dom.js";
 import { currentPage, state } from "./state.js";
 import { ALL_MISSIONS, CARD_MISSIONS } from "./missions.js";
-import { DEFAULT_MP_CONFIG, REQUIRED_THRESHOLD } from "./constants.js";
+import { DEFAULT_MP_CONFIG } from "./constants.js";
 import {
   applyConfigToUI,
   showConfigWarning,
@@ -69,6 +69,10 @@ export function applyPageConfig() {
   if (dom.statLabelStatus) dom.statLabelStatus.textContent = statLabels.status;
   if (dom.statLabelBest) dom.statLabelBest.textContent = statLabels.best;
   if (dom.statLabelBadge) dom.statLabelBadge.textContent = statLabels.badge;
+  if (dom.confidenceAcceptancePanel) dom.confidenceAcceptancePanel.hidden = true;
+  if (dom.confidenceAcceptanceRow) dom.confidenceAcceptanceRow.hidden = true;
+  if (dom.confidenceAcceptanceSummary) dom.confidenceAcceptanceSummary.hidden = true;
+  if (dom.confidenceAcceptanceCheckbox) dom.confidenceAcceptanceCheckbox.checked = false;
 
   if (!currentPage.usesCamera) {
     if (currentPage.showAudio) {
@@ -191,7 +195,7 @@ export function renderStep() {
     if (dom.badgeStateEl) {
       dom.badgeStateEl.textContent = state.badgeState.mission1
         ? "Debloque"
-        : `Objectif ${REQUIRED_THRESHOLD.toFixed(2)}`;
+        : "Seuil raisonnable";
     }
   } else if (currentPage.id === "mission2") {
     if (dom.bestThresholdEl) dom.bestThresholdEl.textContent = state.bestThreshold.toFixed(2);

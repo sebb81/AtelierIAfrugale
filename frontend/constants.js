@@ -1,4 +1,3 @@
-export const REQUIRED_THRESHOLD = 0.75;
 export const HOLD_FRAMES = 10;
 export const DEFAULT_MP_CONFIG = {
   delegate: "cpu",
