@@ -79,7 +79,7 @@ function scoreThumbUp(hand) {
   score += pinkyFolded ? 0.125 : 0;
 
   const threshold = dom.thresholdInput ? Number(dom.thresholdInput.value) : 0;
-  const label = score >= threshold ? "Pouce leve" : "Geste non reconnu";
+  const label = score > threshold ? "Pouce leve" : "Geste non reconnu";
   return { score, label };
 }
 
@@ -241,12 +241,16 @@ export function updateGestureMetrics(landmarks, gesture) {
   const barLabel = gesture && gesture.raw ? gesture.raw : label;
   const threshold = dom.thresholdInput ? Number(dom.thresholdInput.value) : 0;
   const isThumb = label.toLowerCase().includes("pouce");
-  const isValid = isThumb && score >= threshold;
+  const isValid = isThumb && score > threshold;
+  const displayLabel = isThumb && !isValid ? "Geste non reconnu" : label;
+  const barDisplayLabel = isThumb && !isValid ? "Sous seuil" : barLabel;
 
-  if (dom.gestureLabel) dom.gestureLabel.textContent = label;
+  if (dom.gestureLabel) dom.gestureLabel.textContent = displayLabel;
   if (dom.gestureConfidence) dom.gestureConfidence.textContent = score.toFixed(2);
-  if (dom.gestureStatusEl) dom.gestureStatusEl.textContent = isValid ? "Valide" : label;
+  if (dom.gestureStatusEl) {
+    dom.gestureStatusEl.textContent = isValid ? "Valide" : (isThumb ? "Sous seuil" : displayLabel);
+  }
 
-  updateGestureBar(barLabel, score);
+  updateGestureBar(barDisplayLabel, score);
   updateMissionProgress(isValid, score);
 }

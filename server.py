@@ -115,6 +115,7 @@ ASR_SUPPORTED_LANGUAGES = {"fr", "en", "es", "de", "it"}
 ASR_TARGET_SAMPLE_RATE = 16000
 ASR_LOCK = threading.Lock()
 _ASR_BACKEND = None
+_MODEL_BYTES_CACHE = {}
 
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
@@ -170,10 +171,23 @@ def _normalize_config(payload: dict | None) -> dict:
     return config
 
 
+def _read_model_bytes(model_path: str) -> bytes:
+    # MediaPipe can mis-handle Windows absolute paths in some environments.
+    # Loading bytes avoids path resolution issues entirely.
+    key = str(Path(model_path).resolve())
+    cached = _MODEL_BYTES_CACHE.get(key)
+    if cached is not None:
+        return cached
+    data = Path(model_path).read_bytes()
+    _MODEL_BYTES_CACHE[key] = data
+    return data
+
+
 def _create_video_recognizer(model_path: str, config: dict):
     applied = config.copy()
     warning = None
-    base_options = mp_python.BaseOptions(model_asset_path=model_path)
+    model_bytes = _read_model_bytes(model_path)
+    base_options = mp_python.BaseOptions(model_asset_buffer=model_bytes)
 
     if config.get("delegate") == "gpu":
         if platform.system() in {"Linux", "Darwin"}:
@@ -739,6 +753,7 @@ async def ws_endpoint(ws: WebSocket):
     await ws.accept()
     model_path = _ensure_model_file()
     if not model_path:
+        print("[ws] model unavailable")
         await ws.send_text(json.dumps({"error": "Modele MediaPipe indisponible."}))
         await ws.close()
         return
@@ -749,7 +764,8 @@ async def ws_endpoint(ws: WebSocket):
         recognizer, applied_config, warning = _create_video_recognizer(
             str(active_model_path), current_config
         )
-    except Exception:
+    except Exception as exc:
+        print(f"[ws] recognizer init failed: {exc}")
         await ws.send_text(
             json.dumps(
                 {"type": "error", "message": "Impossible de charger le modele."}
@@ -782,7 +798,8 @@ async def ws_endpoint(ws: WebSocket):
                                         str(active_model_path), new_config
                                     )
                                 )
-                            except Exception:
+                            except Exception as exc:
+                                print(f"[ws] config apply failed: {exc}")
                                 await ws.send_text(
                                     json.dumps(
                                         {
@@ -858,8 +875,8 @@ async def ws_endpoint(ws: WebSocket):
             except Exception:
                 # Keep the socket alive on occasional malformed frames or decode errors.
                 continue
-    except WebSocketDisconnect:
-        pass
+    except WebSocketDisconnect as exc:
+        print(f"[ws] client disconnected (code={exc.code})")
     except Exception as exc:
         print(f"[ws] unexpected error: {exc}")
     finally:
@@ -951,8 +968,8 @@ async def ws_emotion(ws: WebSocket):
                 )
             except Exception:
                 continue
-    except WebSocketDisconnect:
-        pass
+    except WebSocketDisconnect as exc:
+        print(f"[ws/emotion] client disconnected (code={exc.code})")
     except Exception as exc:
         print(f"[ws/emotion] unexpected error: {exc}")
     finally:

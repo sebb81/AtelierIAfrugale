@@ -6,6 +6,7 @@ import { connectWebSocket } from "./ws.js";
 import { setupChat } from "./chat.js";
 import { setupAudio } from "./audio.js";
 import { bindMission1AcceptanceControl } from "./gesture.js";
+import { bindMission2AcceptanceControl } from "./emotion.js";
 
 async function boot() {
   applyPageConfig();
@@ -14,6 +15,7 @@ async function boot() {
   renderMissionCards();
   bindConfigControls();
   bindMission1AcceptanceControl();
+  bindMission2AcceptanceControl();
   setupChat();
   setupAudio();
   if (!currentPage.usesCamera) return;

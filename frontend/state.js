@@ -23,6 +23,15 @@ export const state = {
     lastScore: 0,
     lastThreshold: 0
   },
+  mission2Decision: {
+    canAccept: false,
+    canAcceptVisible: false,
+    accepted: false,
+    acceptedThreshold: 0,
+    acceptedConfidence: 0,
+    lastScore: 0,
+    lastThreshold: 0
+  },
   holdFrames: 0,
   lastMessageAt: null,
   fps: 0,

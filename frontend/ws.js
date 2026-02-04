@@ -12,6 +12,7 @@ let reconnectTimerId = null;
 let reconnectAttempts = 0;
 let lifecycleBound = false;
 let allowReconnect = true;
+let frameInFlight = false;
 
 function clearReconnectTimer() {
   if (!reconnectTimerId) return;
@@ -24,13 +25,16 @@ function nextReconnectDelayMs() {
   return Math.min(RECONNECT_MAX_MS, RECONNECT_BASE_MS * 2 ** exp);
 }
 
-function scheduleReconnect() {
+function scheduleReconnect(closeEvent) {
   if (!allowReconnect || !currentPage.usesCamera) return;
+  if (document.visibilityState === "hidden") return;
   if (reconnectTimerId) return;
   const delayMs = nextReconnectDelayMs();
   reconnectAttempts += 1;
   const delaySec = Math.max(1, Math.round(delayMs / 1000));
-  setStatus(`Connexion perdue. Reconnexion automatique dans ${delaySec}s...`);
+  const code =
+    closeEvent && Number.isFinite(closeEvent.code) ? ` (code ${closeEvent.code})` : "";
+  setStatus(`Connexion perdue${code}. Reconnexion automatique dans ${delaySec}s...`);
   reconnectTimerId = setTimeout(() => {
     reconnectTimerId = null;
     connectWebSocket();
@@ -41,19 +45,25 @@ function bindWsLifecycle() {
   if (lifecycleBound) return;
   lifecycleBound = true;
 
+  window.addEventListener("pagehide", () => {
+    allowReconnect = false;
+    clearReconnectTimer();
+  });
+
   window.addEventListener("beforeunload", () => {
     allowReconnect = false;
     clearReconnectTimer();
-    if (state.wsRef) {
-      try {
-        state.wsRef.close();
-      } catch (err) {
-        // Ignore close race on unload.
-      }
-    }
+  });
+
+  window.addEventListener("pageshow", () => {
+    allowReconnect = true;
+    if (!currentPage.usesCamera) return;
+    if (state.wsRef && state.wsRef.readyState !== WebSocket.CLOSED) return;
+    connectWebSocket();
   });
 
   window.addEventListener("online", () => {
+    if (document.visibilityState === "hidden") return;
     if (!currentPage.usesCamera) return;
     if (state.wsRef && state.wsRef.readyState !== WebSocket.CLOSED) return;
     connectWebSocket();
@@ -62,6 +72,7 @@ function bindWsLifecycle() {
 
 export function connectWebSocket() {
   bindWsLifecycle();
+  if (!currentPage.usesCamera) return;
   allowReconnect = true;
   if (state.wsRef && state.wsRef.readyState !== WebSocket.CLOSED) {
     return;
@@ -89,6 +100,7 @@ export function connectWebSocket() {
 
   ws.addEventListener("open", () => {
     reconnectAttempts = 0;
+    frameInFlight = false;
     setStatus("Streaming actif", true);
     if (currentPage.showMpControls) {
       sendConfig();
@@ -96,10 +108,13 @@ export function connectWebSocket() {
     timerId = setInterval(() => {
       if (ws.readyState !== WebSocket.OPEN) return;
       if (!dom.video) return;
+      if (frameInFlight) return;
+      if (ws.bufferedAmount > 1_000_000) return;
       try {
         offCtx.drawImage(dom.video, 0, 0, sendWidth, sendHeight);
         const jpg = off.toDataURL("image/jpeg", 0.6);
         ws.send(jpg);
+        frameInFlight = true;
       } catch (err) {
         // Skip invalid frames without dropping the socket.
       }
@@ -107,6 +122,7 @@ export function connectWebSocket() {
   });
 
   ws.addEventListener("message", (event) => {
+    frameInFlight = false;
     let msg = null;
     try {
       msg = JSON.parse(event.data);
@@ -139,14 +155,15 @@ export function connectWebSocket() {
     updateInferenceTime(msg.metrics);
   });
 
-  ws.addEventListener("close", () => {
+  ws.addEventListener("close", (event) => {
     if (timerId) {
       clearInterval(timerId);
     }
+    frameInFlight = false;
     if (state.wsRef === ws) {
       state.wsRef = null;
     }
-    scheduleReconnect();
+    scheduleReconnect(event);
   });
 
   ws.addEventListener("error", () => {
