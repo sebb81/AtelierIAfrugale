@@ -12,7 +12,16 @@ from pathlib import Path
 import cv2
 import mediapipe as mp
 import numpy as np
-from fastapi import FastAPI, WebSocket, HTTPException, Request, UploadFile, File, Form
+from fastapi import (
+    FastAPI,
+    WebSocket,
+    WebSocketDisconnect,
+    HTTPException,
+    Request,
+    UploadFile,
+    File,
+    Form,
+)
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from mediapipe.tasks import python as mp_python
@@ -755,96 +764,109 @@ async def ws_endpoint(ws: WebSocket):
     try:
         while True:
             payload = await ws.receive_text()
-            if payload.lstrip().startswith("{"):
-                try:
-                    msg = json.loads(payload)
-                except json.JSONDecodeError:
+            try:
+                if payload.lstrip().startswith("{"):
+                    try:
+                        msg = json.loads(payload)
+                    except json.JSONDecodeError:
+                        continue
+                    if msg.get("type") == "config":
+                        new_config = _normalize_config(msg.get("config") or {})
+                        if new_config != current_config:
+                            active_model_path = MODEL_CHOICES.get(
+                                new_config["model"], model_path
+                            )
+                            try:
+                                new_recognizer, applied_config, warning = (
+                                    _create_video_recognizer(
+                                        str(active_model_path), new_config
+                                    )
+                                )
+                            except Exception:
+                                await ws.send_text(
+                                    json.dumps(
+                                        {
+                                            "type": "error",
+                                            "message": "Config invalide ou modele indisponible.",
+                                        }
+                                    )
+                                )
+                                continue
+                            recognizer.close()
+                            recognizer = new_recognizer
+                            current_config = new_config
+                            last_ts = 0
+                        await ws.send_text(
+                            json.dumps(
+                                {
+                                    "type": "config",
+                                    "applied": applied_config,
+                                    "warning": warning,
+                                }
+                            )
+                        )
                     continue
-                if msg.get("type") == "config":
-                    new_config = _normalize_config(msg.get("config") or {})
-                    if new_config != current_config:
-                        active_model_path = MODEL_CHOICES.get(
-                            new_config["model"], model_path
-                        )
-                        try:
-                            new_recognizer, applied_config, warning = (
-                                _create_video_recognizer(
-                                    str(active_model_path), new_config
-                                )
-                            )
-                        except Exception:
-                            await ws.send_text(
-                                json.dumps(
-                                    {
-                                        "type": "error",
-                                        "message": "Config invalide ou modele indisponible.",
-                                    }
-                                )
-                            )
-                            continue
-                        recognizer.close()
-                        recognizer = new_recognizer
-                        current_config = new_config
-                        last_ts = 0
-                    await ws.send_text(
-                        json.dumps(
-                            {
-                                "type": "config",
-                                "applied": applied_config,
-                                "warning": warning,
-                            }
-                        )
+
+                data_url = payload
+
+                # data_url = "data:image/jpeg;base64,...."
+                if "," not in data_url:
+                    await ws.send_text(json.dumps({"landmarks": None}))
+                    continue
+                b64 = data_url.split(",", 1)[1]
+                jpg_bytes = base64.b64decode(b64)
+
+                arr = np.frombuffer(jpg_bytes, dtype=np.uint8)
+                frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)  # BGR
+                if frame is None:
+                    await ws.send_text(json.dumps({"landmarks": None}))
+                    continue
+
+                rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+
+                timestamp_ms = int(time.time() * 1000)
+                if timestamp_ms <= last_ts:
+                    timestamp_ms = last_ts + 1
+                last_ts = timestamp_ms
+
+                start_ts = time.perf_counter()
+                result = recognizer.recognize_for_video(mp_image, timestamp_ms)
+                inference_ms = (time.perf_counter() - start_ts) * 1000.0
+
+                out = []
+                if result.hand_landmarks:
+                    for hand_lms in result.hand_landmarks:
+                        pts = [{"x": lm.x, "y": lm.y, "z": lm.z} for lm in hand_lms]
+                        out.append(pts)
+
+                label, score, raw_label = _extract_gesture(result)
+                await ws.send_text(
+                    json.dumps(
+                        {
+                            "type": "result",
+                            "landmarks": out if out else None,
+                            "gesture": {
+                                "label": label,
+                                "score": score,
+                                "raw": raw_label,
+                            },
+                            "metrics": {"inference_ms": inference_ms},
+                        }
                     )
-                continue
-
-            data_url = payload
-
-            # data_url = "data:image/jpeg;base64,...."
-            if "," not in data_url:
-                await ws.send_text(json.dumps({"landmarks": None}))
-                continue
-            b64 = data_url.split(",", 1)[1]
-            jpg_bytes = base64.b64decode(b64)
-
-            arr = np.frombuffer(jpg_bytes, dtype=np.uint8)
-            frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)  # BGR
-            if frame is None:
-                await ws.send_text(json.dumps({"landmarks": None}))
-                continue
-
-            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
-
-            timestamp_ms = int(time.time() * 1000)
-            if timestamp_ms <= last_ts:
-                timestamp_ms = last_ts + 1
-            last_ts = timestamp_ms
-
-            start_ts = time.perf_counter()
-            result = recognizer.recognize_for_video(mp_image, timestamp_ms)
-            inference_ms = (time.perf_counter() - start_ts) * 1000.0
-
-            out = []
-            if result.hand_landmarks:
-                for hand_lms in result.hand_landmarks:
-                    pts = [{"x": lm.x, "y": lm.y, "z": lm.z} for lm in hand_lms]
-                    out.append(pts)
-
-            label, score, raw_label = _extract_gesture(result)
-            await ws.send_text(
-                json.dumps(
-                    {
-                        "type": "result",
-                        "landmarks": out if out else None,
-                        "gesture": {"label": label, "score": score, "raw": raw_label},
-                        "metrics": {"inference_ms": inference_ms},
-                    }
                 )
-            )
-    except Exception:
+            except Exception:
+                # Keep the socket alive on occasional malformed frames or decode errors.
+                continue
+    except WebSocketDisconnect:
         pass
+    except Exception as exc:
+        print(f"[ws] unexpected error: {exc}")
     finally:
-        recognizer.close()
+        try:
+            recognizer.close()
+        except Exception:
+            pass
 
 
 @app.websocket("/ws/emotion")
@@ -860,73 +882,81 @@ async def ws_emotion(ws: WebSocket):
     try:
         while True:
             payload = await ws.receive_text()
-            if payload.lstrip().startswith("{"):
-                continue
+            try:
+                if payload.lstrip().startswith("{"):
+                    continue
 
-            data_url = payload
-            if "," not in data_url:
+                data_url = payload
+                if "," not in data_url:
+                    await ws.send_text(
+                        json.dumps(
+                            {
+                                "type": "emotion",
+                                "face": False,
+                                "emotion": {"label": "Aucun visage detecte"},
+                            }
+                        )
+                    )
+                    continue
+                b64 = data_url.split(",", 1)[1]
+                jpg_bytes = base64.b64decode(b64)
+
+                arr = np.frombuffer(jpg_bytes, dtype=np.uint8)
+                frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+                if frame is None:
+                    await ws.send_text(
+                        json.dumps(
+                            {
+                                "type": "emotion",
+                                "face": False,
+                                "emotion": {"label": "Aucun visage detecte"},
+                            }
+                        )
+                    )
+                    continue
+
+                rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                start_ts = time.perf_counter()
+                results = face_mesh.process(rgb)
+                inference_ms = (time.perf_counter() - start_ts) * 1000.0
+
+                if not results.multi_face_landmarks:
+                    await ws.send_text(
+                        json.dumps(
+                            {
+                                "type": "emotion",
+                                "face": False,
+                                "emotion": {"label": "Aucun visage detecte"},
+                                "metrics": {"inference_ms": inference_ms},
+                            }
+                        )
+                    )
+                    continue
+
+                face_landmarks = results.multi_face_landmarks[0].landmark
+                label, metrics = _estimate_emotion(face_landmarks)
+                metrics["inference_ms"] = float(inference_ms)
+                guides = _extract_face_guides(face_landmarks)
+
                 await ws.send_text(
                     json.dumps(
                         {
                             "type": "emotion",
-                            "face": False,
-                            "emotion": {"label": "Aucun visage detecte"},
+                            "face": True,
+                            "emotion": {"label": label},
+                            "metrics": metrics,
+                            "guides": guides,
                         }
                     )
                 )
+            except Exception:
                 continue
-            b64 = data_url.split(",", 1)[1]
-            jpg_bytes = base64.b64decode(b64)
-
-            arr = np.frombuffer(jpg_bytes, dtype=np.uint8)
-            frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-            if frame is None:
-                await ws.send_text(
-                    json.dumps(
-                        {
-                            "type": "emotion",
-                            "face": False,
-                            "emotion": {"label": "Aucun visage detecte"},
-                        }
-                    )
-                )
-                continue
-
-            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            start_ts = time.perf_counter()
-            results = face_mesh.process(rgb)
-            inference_ms = (time.perf_counter() - start_ts) * 1000.0
-
-            if not results.multi_face_landmarks:
-                await ws.send_text(
-                    json.dumps(
-                        {
-                            "type": "emotion",
-                            "face": False,
-                            "emotion": {"label": "Aucun visage detecte"},
-                            "metrics": {"inference_ms": inference_ms},
-                        }
-                    )
-                )
-                continue
-
-            face_landmarks = results.multi_face_landmarks[0].landmark
-            label, metrics = _estimate_emotion(face_landmarks)
-            metrics["inference_ms"] = float(inference_ms)
-            guides = _extract_face_guides(face_landmarks)
-
-            await ws.send_text(
-                json.dumps(
-                    {
-                        "type": "emotion",
-                        "face": True,
-                        "emotion": {"label": label},
-                        "metrics": metrics,
-                        "guides": guides,
-                    }
-                )
-            )
-    except Exception:
+    except WebSocketDisconnect:
         pass
+    except Exception as exc:
+        print(f"[ws/emotion] unexpected error: {exc}")
     finally:
-        face_mesh.close()
+        try:
+            face_mesh.close()
+        except Exception:
+            pass

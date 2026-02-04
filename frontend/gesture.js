@@ -95,15 +95,14 @@ function renderMission1AcceptanceUI() {
   }
 
   const accepted = state.mission1Decision.accepted;
-  const canAccept = state.mission1Decision.canAccept;
-  const showPanel = accepted || canAccept;
+  const showPanel = accepted || state.mission1Decision.canAcceptVisible;
 
   if (dom.confidenceAcceptancePanel) dom.confidenceAcceptancePanel.hidden = !showPanel;
   if (dom.confidenceAcceptanceRow) dom.confidenceAcceptanceRow.hidden = !showPanel || accepted;
 
   if (dom.confidenceAcceptanceCheckbox) {
     dom.confidenceAcceptanceCheckbox.checked = accepted;
-    dom.confidenceAcceptanceCheckbox.disabled = accepted || !canAccept;
+    dom.confidenceAcceptanceCheckbox.disabled = accepted;
   }
 
   if (dom.confidenceAcceptanceSummary) {
@@ -132,14 +131,13 @@ export function bindMission1AcceptanceControl() {
   dom.confidenceAcceptanceCheckbox.dataset.bound = "1";
   dom.confidenceAcceptanceCheckbox.addEventListener("change", () => {
     if (!dom.confidenceAcceptanceCheckbox.checked) return;
-    if (!state.mission1Decision.canAccept) {
+    if (!state.mission1Decision.canAcceptVisible) {
       dom.confidenceAcceptanceCheckbox.checked = false;
       return;
     }
 
-    const threshold = dom.thresholdInput ? Number(dom.thresholdInput.value) : 0;
     state.mission1Decision.accepted = true;
-    state.mission1Decision.acceptedThreshold = threshold;
+    state.mission1Decision.acceptedThreshold = state.mission1Decision.lastThreshold;
     state.mission1Decision.acceptedConfidence = state.mission1Decision.lastScore;
 
     if (!state.badgeState.mission1) {
@@ -173,8 +171,13 @@ export function updateMissionProgress(isValid, score) {
   }
 
   const threshold = dom.thresholdInput ? Number(dom.thresholdInput.value) : 0;
-  state.mission1Decision.canAccept = isValid && score >= threshold;
-  state.mission1Decision.lastScore = score;
+  const canAccept = isValid && score >= threshold;
+  state.mission1Decision.canAccept = canAccept;
+  if (canAccept) {
+    state.mission1Decision.canAcceptVisible = true;
+    state.mission1Decision.lastScore = score;
+    state.mission1Decision.lastThreshold = threshold;
+  }
 
   setMission1BadgeText();
   renderMission1AcceptanceUI();

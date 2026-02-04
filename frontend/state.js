@@ -16,10 +16,12 @@ export const state = {
   bestThreshold: 0,
   mission1Decision: {
     canAccept: false,
+    canAcceptVisible: false,
     accepted: false,
     acceptedThreshold: 0,
     acceptedConfidence: 0,
-    lastScore: 0
+    lastScore: 0,
+    lastThreshold: 0
   },
   holdFrames: 0,
   lastMessageAt: null,
