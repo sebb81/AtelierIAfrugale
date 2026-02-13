@@ -84,7 +84,7 @@ export const PAGE_CONFIG = {
         title: "Accueil du serious game",
         body:
           "Tu disposes de 5 missions. Commence par la mission 1 pour la detection de geste en local.",
-        hint: "Objectif : tester une IA sobre a chaque etape.",
+        hint: "Objectif : tester une IA sobre à chaque etape.",
         type: "info"
       }
     ]
@@ -93,13 +93,13 @@ export const PAGE_CONFIG = {
     id: "mission1",
     heroTitle: "Serious Game IA frugales",
     heroBody:
-      "Un parcours d experimentation autour des IA locales et sobres. Chaque mission met en scene un arbitrage precision, latence et impact.",
+      "Un parcours d' experimentation autour des IA locales et sobres. Chaque mission met en scène un arbitrage précision, latence et impact.",
     stageTitle: "Atelier vision locale",
-    stageDesc: "Detection mains en direct. Rien ne sort de la machine.",
+    stageDesc: "Détection mains en direct. Rien ne sort de la machine.",
     missionTitle: "Briefing de mission",
-    missionSubtitle: "Serious game IA frugale : missions courtes, badges a debloquer.",
-    placeholderTitle: "Module en preparation",
-    placeholderBody: "Cette mission utilise un autre capteur ou un autre type de modele.",
+    missionSubtitle: "Serious game IA frugale : missions courtes, badges à débloquer.",
+    placeholderTitle: "Module en préparation",
+    placeholderBody: "Cette mission utilise un autre capteur ou un autre type de modèle.",
     kpiLabels: {
       gesture: "Geste detecte",
       confidence: "Confiance",
@@ -128,8 +128,8 @@ export const PAGE_CONFIG = {
         id: "intro",
         title: "Briefing : IA frugale",
         body:
-          "Tu pilotes un labo d IA locale. Objectif : livrer de la valeur avec un budget energie minimal. Chaque mission explore un compromis entre precision, latence et sobriete.",
-        hint: "Garde en tete la triade valeur, cout, empreinte.",
+          "Tu pilotes un labo d'IA locale. Objectif : livrer de la valeur avec un budget énergie minimal. Chaque mission explore un compromis entre précision, latence et sobriété.",
+        hint: "Garde en tête la triade valeur, coût, empreinte.",
         type: "info"
       },
       {
@@ -158,10 +158,10 @@ export const PAGE_CONFIG = {
       "Observer une emotion sans sur-consommer. On joue sur la precision percue et la sobriete du modele.",
     stageTitle: "Atelier emotion",
     stageDesc: "Face mesh en direct pour lire une nuance emotionnelle.",
-    missionTitle: "Briefing emotion",
-    missionSubtitle: "Comprendre les limites, la contextuelle, et la sobriete.",
+    missionTitle: "Briefing émotion",
+    missionSubtitle: "Comprendre les limites, la contextuelle, et la sobriété.",
     placeholderTitle: "Capteur alternatif",
-    placeholderBody: "Module emotion en preparation. Utilise un flux de donnees pre-enregistre.",
+    placeholderBody: "Module emotion en préparation. Utilise un flux de données pre-enregistré.",
     kpiLabels: {
       gesture: "Emotion",
       confidence: "Smile ratio",
@@ -190,16 +190,16 @@ export const PAGE_CONFIG = {
         id: "mission2",
         title: "Mission 2 - Emotion responsable",
         body:
-          "Scenario : une conseillere bancaire adapte son discours a l humeur du client. Tu dois limiter la complexite du modele.",
-        hint: "Defi : ajuster le seuil de sourire sans fausse detection.",
+          "Scénario : une conseillère bancaire adapte son discours à l' humeur du client. Tu dois limiter la compléxité du modèle.",
+        hint: "Défi : ajuster le seuil de sourire sans fausse détection.",
         type: "info"
       },
       {
         id: "debrief",
         title: "Debrief",
         body:
-          "Moins de variables = plus de sobriete. Priorise les signaux vraiment utiles.",
-        hint: "Pense a des seuils, pas a une emotion parfaite.",
+          "Moins de variables = plus de sobriété. Priorise les signaux vraiment utiles.",
+        hint: "Pense à des seuils, pas à une émotion parfaite.",
         type: "info"
       }
     ]
@@ -212,9 +212,9 @@ export const PAGE_CONFIG = {
     stageTitle: "Atelier chatbot",
     stageDesc: "Prototype texte local via un serveur llama.cpp.",
     missionTitle: "Briefing chatbot",
-    missionSubtitle: "Composer des reponses utiles avec un modele compact.",
+    missionSubtitle: "Composer des réponses utiles avec un modèle compact.",
     placeholderTitle: "Mode texte",
-    placeholderBody: "Module chatbot en preparation. Simule des reponses courtes et utiles.",
+    placeholderBody: "Module chatbot en préparation. Simule des réponses courtes et utiles.",
     kpiLabels: {
       gesture: "Pertinence",
       confidence: "Concision",
@@ -232,16 +232,16 @@ export const PAGE_CONFIG = {
         id: "mission3",
         title: "Mission 3 - Chatbot compact",
         body:
-          "Scenario : repondre a un client en moins de 2 secondes. Tu dois garder une reponse claire et locale.",
-        hint: "Defi : limiter le contexte sans perdre l essentiel.",
+          "Scenario : Répondre à un client en moins de 2 secondes. Tu dois garder une réponse claire et locale.",
+        hint: "Défi : limiter le contexte sans perdre l'essentiel.",
         type: "info"
       },
       {
         id: "debrief",
         title: "Debrief",
         body:
-          "Des prompts plus courts reduisent l energie. Utilise des patrons simples.",
-        hint: "Un bon cadre bat un grand modele.",
+          "Des prompts plus courts reduisent l'énergie. Utilise des patrons simples.",
+        hint: "Un bon cadre bat un grand modèle.",
         type: "info"
       }
     ]
@@ -250,16 +250,16 @@ export const PAGE_CONFIG = {
     id: "mission4",
     heroTitle: "Mission 4 - RAG frugal",
     heroBody:
-      "Limiter les documents, cibler les sources utiles, et garder la reponse locale.",
+      "Limiter les documents, cibler les sources utiles, et garder la réponse locale.",
     stageTitle: "Atelier documents",
-    stageDesc: "Prototype RAG local : indexation frugale et reponse guidee.",
+    stageDesc: "Prototype RAG local : indexation frugale et réponse guidée.",
     missionTitle: "Briefing RAG",
-    missionSubtitle: "Prioriser l impact plutot que l exhaustivite.",
+    missionSubtitle: "Prioriser l'impact plutôt que l'exhaustivité.",
     placeholderTitle: "RAG local",
-    placeholderBody: "Module RAG en preparation. Travaille sur un corpus reduit.",
+    placeholderBody: "Module RAG en préparation. Travaille sur un corpus réduit.",
     kpiLabels: {
       gesture: "Couverture",
-      confidence: "Precision",
+      confidence: "Précision",
       fps: "Index"
     },
     usesCamera: false,
@@ -284,15 +284,15 @@ export const PAGE_CONFIG = {
         id: "mission4",
         title: "Mission 4 - RAG frugal",
         body:
-          "Scenario : repondre a des questions internes sans charger tout l historique.",
-        hint: "Defi : selectionner 5 documents utiles.",
+          "Scenario : Répondre à des questions internes sans charger tout l'historique.",
+        hint: "Défi : Sélectionner 5 documents utiles.",
         type: "info"
       },
       {
         id: "debrief",
         title: "Debrief",
         body:
-          "Moins de sources = moins de cout. Mesure avant d ajouter.",
+          "Moins de sources = moins de coût. Mesure avant d ajouter.",
         hint: "Le bruit coute plus que le manque.",
         type: "info"
       }
@@ -306,11 +306,11 @@ export const PAGE_CONFIG = {
     stageTitle: "Atelier audio",
     stageDesc: "Micro local + Whisper Tiny pour jouer la concision.",
     missionTitle: "Briefing audio",
-    missionSubtitle: "Garder un service utile avec un modele leger.",
+    missionSubtitle: "Garder un service utile avec un modèle léger.",
     placeholderTitle: "Micro local",
-    placeholderBody: "Module audio en preparation. Simule des commandes courtes.",
+    placeholderBody: "Module audio en préparation. Simule des commandes courtes.",
     kpiLabels: {
-      gesture: "Clarte",
+      gesture: "Clarté",
       confidence: "Robustesse",
       fps: "Latence"
     },
@@ -324,7 +324,7 @@ export const PAGE_CONFIG = {
         title: "Mission 5 - Audio sobre",
         body:
           "Scenario : dicter une phrase, puis la raccourcir en gardant le sens.",
-        hint: "Defi : 3 essais, de la phrase complete aux mots-cles.",
+        hint: "Défi : 3 essais, de la phrase complète aux mots-clés.",
         type: "info"
       },
       {
