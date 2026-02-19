@@ -4,26 +4,26 @@ export const ALL_MISSIONS = [
     title: "Mission 1 - Geste",
     desc: "Pouce leve, seuil de confiance."
   },
+  // {
+  //   id: "mission2",
+  //   title: "Mission 2 - Emotion",
+  //   desc: "Face mesh et nuance emotionnelle."
+  // },
   {
     id: "mission2",
-    title: "Mission 2 - Emotion",
-    desc: "Face mesh et nuance emotionnelle."
-  },
-  {
-    id: "mission3",
-    title: "Mission 3 - Chatbot",
+    title: "Mission 2 - Chatbot",
     desc: "Assistant compact et local."
   },
   {
-    id: "mission4",
-    title: "Mission 4 - Documents",
+    id: "mission3",
+    title: "Mission 3 - Documents",
     desc: "RAG frugal sur documents internes."
-  },
-  {
-    id: "mission5",
-    title: "Mission 5 - Audio",
-    desc: "Reconnaissance vocale sobre."
   }
+  // {
+  //   id: "mission5",
+  //   title: "Mission 5 - Audio",
+  //   desc: "Reconnaissance vocale sobre."
+  // }
 ];
 
 export const CARD_MISSIONS = [
@@ -33,30 +33,30 @@ export const CARD_MISSIONS = [
     title: "Mission 1 - Geste frugal",
     desc: "👉 Reconnaître un geste… sans viser la perfection."
   },
+  // {
+  //   id: "mission2",
+  //   label: "M2",
+  //   title: "Mission 2 - Emotion responsable",
+  //   desc: "👉 Accepter l’incertitude plutôt que surentraîner."
+  // },
   {
     id: "mission2",
     label: "M2",
-    title: "Mission 2 - Emotion responsable",
-    desc: "👉 Accepter l’incertitude plutôt que surentraîner."
+    title: "Mission 2 - Chatbot compact",
+    desc: "👉 Un modèle plus petit peut-il suffire ?"
   },
   {
     id: "mission3",
     label: "M3",
-    title: "Mission 3 - Chatbot compact",
-    desc: "👉 Un modèle plus petit peut-il suffire ?"
-  },
-  {
-    id: "mission4",
-    label: "M4",
-    title: "Mission 4 - RAG frugal",
+    title: "Mission 3 - RAG frugal",
     desc: "👉 Moins de documents, mais mieux choisis."
-  },
-  {
-    id: "mission5",
-    label: "M5",
-    title: "Mission 5 - Audio sobre",
-    desc: "👉 Reconnaissance vocale locale et legere."
   }
+  // {
+  //   id: "mission5",
+  //   label: "M5",
+  //   title: "Mission 5 - Audio sobre",
+  //   desc: "👉 Reconnaissance vocale locale et legere."
+  // }
 ];
 
 export const PAGE_CONFIG = {
@@ -151,62 +151,62 @@ export const PAGE_CONFIG = {
       }
     ]
   },
+  // mission2: {
+  //   id: "mission2",
+  //   heroTitle: "Mission 2 - Emotion responsable",
+  //   heroBody:
+  //     "Observer une emotion sans sur-consommer. On joue sur la precision percue et la sobriete du modele.",
+  //   stageTitle: "Atelier emotion",
+  //   stageDesc: "Face mesh en direct pour lire une nuance emotionnelle.",
+  //   missionTitle: "Briefing émotion",
+  //   missionSubtitle: "Comprendre les limites, la contextuelle, et la sobriété.",
+  //   placeholderTitle: "Capteur alternatif",
+  //   placeholderBody: "Module emotion en préparation. Utilise un flux de données pre-enregistré.",
+  //   kpiLabels: {
+  //     gesture: "Emotion",
+  //     confidence: "Smile ratio",
+  //     fps: "FPS"
+  //   },
+  //   usesCamera: true,
+  //   wsEndpoint: "/ws/emotion",
+  //   showMpControls: false,
+  //   challenge: true,
+  //   defaultThreshold: 0.38,
+  //   threshold: {
+  //     label: "Seuil de sourire",
+  //     min: 0.3,
+  //     max: 0.6,
+  //     step: 0.01,
+  //     value: 0.38
+  //   },
+  //   statLabels: {
+  //     score: "Smile ratio",
+  //     status: "Emotion",
+  //     best: "Meilleur seuil",
+  //     badge: "Badge"
+  //   },
+  //   steps: [
+  //     {
+  //       id: "mission2",
+  //       title: "Mission 2 - Emotion responsable",
+  //       body:
+  //         "Scénario : une conseillère bancaire adapte son discours à l' humeur du client. Tu dois limiter la compléxité du modèle.",
+  //       hint: "Défi : ajuster le seuil de sourire sans fausse détection.",
+  //       type: "info"
+  //     },
+  //     {
+  //       id: "debrief",
+  //       title: "Debrief",
+  //       body:
+  //         "Moins de variables = plus de sobriété. Priorise les signaux vraiment utiles.",
+  //       hint: "Pense à des seuils, pas à une émotion parfaite.",
+  //       type: "info"
+  //     }
+  //   ]
+  // },
   mission2: {
     id: "mission2",
-    heroTitle: "Mission 2 - Emotion responsable",
-    heroBody:
-      "Observer une emotion sans sur-consommer. On joue sur la precision percue et la sobriete du modele.",
-    stageTitle: "Atelier emotion",
-    stageDesc: "Face mesh en direct pour lire une nuance emotionnelle.",
-    missionTitle: "Briefing émotion",
-    missionSubtitle: "Comprendre les limites, la contextuelle, et la sobriété.",
-    placeholderTitle: "Capteur alternatif",
-    placeholderBody: "Module emotion en préparation. Utilise un flux de données pre-enregistré.",
-    kpiLabels: {
-      gesture: "Emotion",
-      confidence: "Smile ratio",
-      fps: "FPS"
-    },
-    usesCamera: true,
-    wsEndpoint: "/ws/emotion",
-    showMpControls: false,
-    challenge: true,
-    defaultThreshold: 0.38,
-    threshold: {
-      label: "Seuil de sourire",
-      min: 0.3,
-      max: 0.6,
-      step: 0.01,
-      value: 0.38
-    },
-    statLabels: {
-      score: "Smile ratio",
-      status: "Emotion",
-      best: "Meilleur seuil",
-      badge: "Badge"
-    },
-    steps: [
-      {
-        id: "mission2",
-        title: "Mission 2 - Emotion responsable",
-        body:
-          "Scénario : une conseillère bancaire adapte son discours à l' humeur du client. Tu dois limiter la compléxité du modèle.",
-        hint: "Défi : ajuster le seuil de sourire sans fausse détection.",
-        type: "info"
-      },
-      {
-        id: "debrief",
-        title: "Debrief",
-        body:
-          "Moins de variables = plus de sobriété. Priorise les signaux vraiment utiles.",
-        hint: "Pense à des seuils, pas à une émotion parfaite.",
-        type: "info"
-      }
-    ]
-  },
-  mission3: {
-    id: "mission3",
-    heroTitle: "Mission 3 - Chatbot compact",
+    heroTitle: "Mission 2 - Chatbot compact",
     heroBody:
       "Un assistant local, rapide, et assez bon pour le quotidien. La valeur d usage avant la taille du modele.",
     stageTitle: "Atelier chatbot",
@@ -229,8 +229,8 @@ export const PAGE_CONFIG = {
     defaultThreshold: 0.6,
     steps: [
       {
-        id: "mission3",
-        title: "Mission 3 - Chatbot compact",
+        id: "mission2",
+        title: "Mission 2 - Chatbot compact",
         body:
           "Scenario : Répondre à un client en moins de 2 secondes. Tu dois garder une réponse claire et locale.",
         hint: "Défi : limiter le contexte sans perdre l'essentiel.",
@@ -246,9 +246,9 @@ export const PAGE_CONFIG = {
       }
     ]
   },
-  mission4: {
-    id: "mission4",
-    heroTitle: "Mission 4 - RAG frugal",
+  mission3: {
+    id: "mission3",
+    heroTitle: "Mission 3 - RAG frugal",
     heroBody:
       "Limiter les documents, cibler les sources utiles, et garder la réponse locale.",
     stageTitle: "Atelier documents",
@@ -281,8 +281,8 @@ export const PAGE_CONFIG = {
     defaultThreshold: 0.6,
     steps: [
       {
-        id: "mission4",
-        title: "Mission 4 - RAG frugal",
+        id: "mission3",
+        title: "Mission 3 - RAG frugal",
         body:
           "Scenario : Répondre à des questions internes sans charger tout l'historique.",
         hint: "Défi : Sélectionner 5 documents utiles.",
@@ -297,44 +297,44 @@ export const PAGE_CONFIG = {
         type: "info"
       }
     ]
-  },
-  mission5: {
-    id: "mission5",
-    heroTitle: "Mission 5 - Audio sobre",
-    heroBody:
-      "Reconnaissance vocale locale, sans streaming. On accepte un peu d erreur pour baisser l empreinte.",
-    stageTitle: "Atelier audio",
-    stageDesc: "Micro local + Whisper Tiny pour jouer la concision.",
-    missionTitle: "Briefing audio",
-    missionSubtitle: "Garder un service utile avec un modèle léger.",
-    placeholderTitle: "Micro local",
-    placeholderBody: "Module audio en préparation. Simule des commandes courtes.",
-    kpiLabels: {
-      gesture: "Clarté",
-      confidence: "Robustesse",
-      fps: "Latence"
-    },
-    usesCamera: false,
-    showAudio: true,
-    audioEndpoint: "/api/audio/transcribe",
-    defaultThreshold: 0.6,
-    steps: [
-      {
-        id: "mission5",
-        title: "Mission 5 - Audio sobre",
-        body:
-          "Scenario : dicter une phrase, puis la raccourcir en gardant le sens.",
-        hint: "Défi : 3 essais, de la phrase complète aux mots-clés.",
-        type: "info"
-      },
-      {
-        id: "debrief",
-        title: "Debrief",
-        body:
-          "Un vocabulaire restreint augmente la fiabilite et diminue l energie.",
-        hint: "Le contexte doit rester minimal.",
-        type: "info"
-      }
-    ]
   }
+  // mission5: {
+  //   id: "mission5",
+  //   heroTitle: "Mission 5 - Audio sobre",
+  //   heroBody:
+  //     "Reconnaissance vocale locale, sans streaming. On accepte un peu d erreur pour baisser l empreinte.",
+  //   stageTitle: "Atelier audio",
+  //   stageDesc: "Micro local + Whisper Tiny pour jouer la concision.",
+  //   missionTitle: "Briefing audio",
+  //   missionSubtitle: "Garder un service utile avec un modèle léger.",
+  //   placeholderTitle: "Micro local",
+  //   placeholderBody: "Module audio en préparation. Simule des commandes courtes.",
+  //   kpiLabels: {
+  //     gesture: "Clarté",
+  //     confidence: "Robustesse",
+  //     fps: "Latence"
+  //   },
+  //   usesCamera: false,
+  //   showAudio: true,
+  //   audioEndpoint: "/api/audio/transcribe",
+  //   defaultThreshold: 0.6,
+  //   steps: [
+  //     {
+  //       id: "mission5",
+  //       title: "Mission 5 - Audio sobre",
+  //       body:
+  //         "Scenario : dicter une phrase, puis la raccourcir en gardant le sens.",
+  //       hint: "Défi : 3 essais, de la phrase complète aux mots-clés.",
+  //       type: "info"
+  //     },
+  //     {
+  //       id: "debrief",
+  //       title: "Debrief",
+  //       body:
+  //         "Un vocabulaire restreint augmente la fiabilite et diminue l energie.",
+  //       hint: "Le contexte doit rester minimal.",
+  //       type: "info"
+  //     }
+  //   ]
+  // }
 };
