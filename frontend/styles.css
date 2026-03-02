@@ -379,6 +379,14 @@ p {
   display: none;
 }
 
+.gesture-live-panel {
+  margin-top: 14px;
+}
+
+.gesture-live-card {
+  width: 100%;
+}
+
 .gesture-readout {
   margin-top: 14px;
   display: grid;

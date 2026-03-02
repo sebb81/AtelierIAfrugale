@@ -43,6 +43,7 @@ export const dom = {
   missionTitle: document.getElementById("mission-title"),
   missionSubtitle: document.getElementById("mission-subtitle"),
   stageMedia: document.getElementById("stage-media"),
+  gestureLivePanel: document.getElementById("gesture-live-panel"),
   stagePlaceholder: document.getElementById("stage-placeholder"),
   audioPanel: document.getElementById("audio-panel"),
   audioLanguage: document.getElementById("audio-language"),

@@ -26,6 +26,12 @@ export function applyPageConfig() {
   if (dom.kpiLabelFps) dom.kpiLabelFps.textContent = currentPage.kpiLabels.fps;
 
   if (dom.stageMedia) dom.stageMedia.hidden = !currentPage.usesCamera;
+  if (dom.gestureLivePanel) {
+    const showGestureLivePanel = Boolean(
+      currentPage.usesCamera && (currentPage.showGestureLivePanel ?? false)
+    );
+    dom.gestureLivePanel.hidden = !showGestureLivePanel;
+  }
   if (dom.audioPanel) dom.audioPanel.hidden = !currentPage.showAudio;
   if (dom.chatPanel) dom.chatPanel.hidden = !currentPage.showChat;
   if (dom.stagePlaceholder) {

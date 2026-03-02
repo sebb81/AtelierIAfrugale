@@ -13,6 +13,14 @@
         <canvas id="overlay"></canvas>
       </div>
     </div>
+    {% if page_id == "mission1" %}
+    <div id="gesture-live-panel" class="gesture-live-panel">
+      <div class="stat gesture-live-card">
+        <span>Geste detecte</span>
+        <strong id="gesture-label">En attente</strong>
+      </div>
+    </div>
+    {% endif %}
     <div id="gesture-readout" class="gesture-readout" hidden>
       <div class="gesture-time">
         Inference time (ms): <strong id="inference-time">0.0</strong>

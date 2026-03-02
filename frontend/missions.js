@@ -110,6 +110,7 @@ export const PAGE_CONFIG = {
     showMpControls: true,
     showMpConfidenceControls: false,
     showGestureReadout: false,
+    showGestureLivePanel: true,
     showBestThresholdStat: false,
     showBadgeStat: false,
     showConfidenceAcceptance: false,
