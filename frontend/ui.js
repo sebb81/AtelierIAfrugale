@@ -37,9 +37,22 @@ export function applyPageConfig() {
     if (placeholderTitle) placeholderTitle.textContent = currentPage.placeholderTitle;
     if (placeholderBody) placeholderBody.textContent = currentPage.placeholderBody;
   }
-  if (dom.gestureReadout) dom.gestureReadout.hidden = !currentPage.usesCamera;
+  if (dom.gestureReadout) {
+    const showGestureReadout = Boolean(
+      currentPage.usesCamera && (currentPage.showGestureReadout ?? true)
+    );
+    dom.gestureReadout.hidden = !showGestureReadout;
+  }
   if (dom.gestureControls) {
     dom.gestureControls.hidden = !(currentPage.usesCamera && currentPage.showMpControls);
+  }
+  if (dom.mpConfidenceControls) {
+    const showMpConfidenceControls = Boolean(
+      currentPage.usesCamera &&
+        currentPage.showMpControls &&
+        (currentPage.showMpConfidenceControls ?? true)
+    );
+    dom.mpConfidenceControls.hidden = !showMpConfidenceControls;
   }
 
   const thresholdConfig = currentPage.threshold || {
@@ -69,6 +82,12 @@ export function applyPageConfig() {
   if (dom.statLabelStatus) dom.statLabelStatus.textContent = statLabels.status;
   if (dom.statLabelBest) dom.statLabelBest.textContent = statLabels.best;
   if (dom.statLabelBadge) dom.statLabelBadge.textContent = statLabels.badge;
+  if (dom.bestThresholdStat) {
+    dom.bestThresholdStat.hidden = !(currentPage.showBestThresholdStat ?? true);
+  }
+  if (dom.badgeStat) {
+    dom.badgeStat.hidden = !(currentPage.showBadgeStat ?? true);
+  }
   if (dom.confidenceAcceptancePanel) dom.confidenceAcceptancePanel.hidden = true;
   if (dom.confidenceAcceptanceRow) dom.confidenceAcceptanceRow.hidden = true;
   if (dom.confidenceAcceptanceSummary) dom.confidenceAcceptanceSummary.hidden = true;

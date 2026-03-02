@@ -30,8 +30,8 @@ export const CARD_MISSIONS = [
   {
     id: "mission1",
     label: "M1",
-    title: "Mission 1 - Geste frugal",
-    desc: "👉 Reconnaître un geste… sans viser la perfection."
+    title: "Mission 1 - Une IA locale et spécialisée",
+    desc: "👉 Une tâche simple. Un modèle minimal. Est-ce suffisant ?"
   },
   // {
   //   id: "mission2",
@@ -83,7 +83,7 @@ export const PAGE_CONFIG = {
         id: "home",
         title: "Accueil du serious game",
         body:
-          "Tu disposes de 5 missions. Commence par la mission 1 pour la detection de geste en local.",
+          "Tu disposes de 3 missions. Commence par la mission 1 pour la detection de geste en local.",
         hint: "Objectif : tester une IA sobre à chaque etape.",
         type: "info"
       }
@@ -95,7 +95,7 @@ export const PAGE_CONFIG = {
     heroBody:
       "Un parcours d' experimentation autour des IA locales et sobres. Chaque mission met en scène un arbitrage précision, latence et impact.",
     stageTitle: "Atelier vision locale",
-    stageDesc: "Détection mains en direct. Rien ne sort de la machine.",
+    stageDesc: "Une IA minimale, pour une tâche précise.",
     missionTitle: "Briefing de mission",
     missionSubtitle: "Serious game IA frugale : missions courtes, badges à débloquer.",
     placeholderTitle: "Module en préparation",
@@ -108,7 +108,12 @@ export const PAGE_CONFIG = {
     usesCamera: true,
     wsEndpoint: "/ws",
     showMpControls: true,
-    challenge: true,
+    showMpConfidenceControls: false,
+    showGestureReadout: false,
+    showBestThresholdStat: false,
+    showBadgeStat: false,
+    showConfidenceAcceptance: false,
+    challenge: false,
     defaultThreshold: 0.6,
     threshold: {
       label: "Seuil de confiance",
@@ -128,8 +133,8 @@ export const PAGE_CONFIG = {
         id: "intro",
         title: "Briefing : IA frugale",
         body:
-          "Tu pilotes un labo d'IA locale. Objectif : livrer de la valeur avec un budget énergie minimal. Chaque mission explore un compromis entre précision, latence et sobriété.",
-        hint: "Garde en tête la triade valeur, coût, empreinte.",
+          "Vous pilotez un système d’IA embarquée. Observez ce qu’il détecte. Identifiez ce qu’il comprend… et ce qu’il ne comprend pas.",
+        hint: "Chaque mission explore un compromis entre précision, rapidité et impact.",
         type: "info"
       },
       {
@@ -212,7 +217,7 @@ export const PAGE_CONFIG = {
     stageTitle: "Atelier chatbot",
     stageDesc: "Prototype texte local via un serveur llama.cpp.",
     missionTitle: "Briefing chatbot",
-    missionSubtitle: "Composer des réponses utiles avec un modèle compact.",
+    missionSubtitle: "Composer avec un modèle compact.",
     placeholderTitle: "Mode texte",
     placeholderBody: "Module chatbot en préparation. Simule des réponses courtes et utiles.",
     kpiLabels: {
@@ -224,7 +229,7 @@ export const PAGE_CONFIG = {
     showChat: true,
     chatEndpoint: "/api/chat",
     chatSystemPrompt:
-      "Tu es un assistant IA local. Reponds en francais, de maniere claire et structuree. Si l'utilisateur demande du code, donne un exemple minimal et correct.",
+      "Tu es un assistant IA compact fonctionnant en local. Tu dois répondre en moins de 8 lignes. Tu dois aller à l’essentiel. Tu évites les phrases inutiles.",
     chatPlaceholder: "Posez votre question...",
     defaultThreshold: 0.6,
     steps: [
@@ -232,8 +237,8 @@ export const PAGE_CONFIG = {
         id: "mission2",
         title: "Mission 2 - Chatbot compact",
         body:
-          "Scenario : Répondre à un client en moins de 2 secondes. Tu dois garder une réponse claire et locale.",
-        hint: "Défi : limiter le contexte sans perdre l'essentiel.",
+          "Scenario : garder une réponse claire, sans excès.",
+        hint: "Défi : produire une réponse utile en moins de 6 lignes.",
         type: "info"
       },
       {
@@ -267,16 +272,12 @@ export const PAGE_CONFIG = {
     chatMode: "rag",
     chatEndpoint: "/api/rag/chat",
     ragStateEndpoint: "/api/rag/state",
-    ragIndexEndpoint: "/api/rag/index",
-    ragResetEndpoint: "/api/rag/reset",
     ragConfig: {
-      chunkSize: 1200,
-      overlap: 200,
-      topK: 6,
+      topK: 8,
       minScore: 0.25
     },
     chatSystemPrompt:
-      "Tu es un assistant IA local. Tu dois repondre en francais. Si un CONTEXTE DOCUMENTAIRE est fourni, utilise-le en priorite et cite tes sources avec les numeros entre crochets (ex: [1], [2]). Si le contexte ne contient pas l'information, dis-le clairement et propose quoi chercher.",
+      "Réponds uniquement à partir des documents fournis. Si absent du contexte : dis-le. Ne devine pas. Cite tes sources. Réponse courte + bullets.",
     chatPlaceholder: "Posez une question...",
     defaultThreshold: 0.6,
     steps: [
@@ -284,8 +285,9 @@ export const PAGE_CONFIG = {
         id: "mission3",
         title: "Mission 3 - RAG frugal",
         body:
-          "Scenario : Répondre à des questions internes sans charger tout l'historique.",
-        hint: "Défi : Sélectionner 5 documents utiles.",
+          "Un chatbot classique répond avec ce qu’il a appris pendant son entraînement.\n\nUn RAG va chercher des documents précis (PDF, site web, base interne…)\n\nPuis il utilise ces documents pour construire sa réponse.\n\nRésultat : réponses plus fiables, plus à jour, et adaptées à votre contexte.\n\nImage mentale :\n\nChatGPT seul = “je réponds avec ma mémoire”\nRAG = “je vais d’abord chercher dans vos documents, puis je réponds”",
+        hint:
+          "En une phrase :\n\n👉 Un RAG, c’est un chatbot qui lit vos documents avant de vous répondre.",
         type: "info"
       },
       {

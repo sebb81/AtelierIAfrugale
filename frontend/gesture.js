@@ -89,7 +89,7 @@ function setMission1BadgeText() {
 }
 
 function renderMission1AcceptanceUI() {
-  if (currentPage.id !== "mission1") {
+  if (currentPage.id !== "mission1" || currentPage.showConfidenceAcceptance === false) {
     if (dom.confidenceAcceptancePanel) dom.confidenceAcceptancePanel.hidden = true;
     return;
   }
@@ -121,6 +121,10 @@ function renderMission1AcceptanceUI() {
 
 export function bindMission1AcceptanceControl() {
   if (currentPage.id !== "mission1") return;
+  if (currentPage.showConfidenceAcceptance === false) {
+    renderMission1AcceptanceUI();
+    return;
+  }
   if (!dom.confidenceAcceptanceCheckbox) return;
 
   if (dom.confidenceAcceptanceCheckbox.dataset.bound === "1") {
@@ -177,6 +181,15 @@ export function updateMissionProgress(isValid, score) {
     state.mission1Decision.canAcceptVisible = true;
     state.mission1Decision.lastScore = score;
     state.mission1Decision.lastThreshold = threshold;
+  }
+  if (currentPage.showConfidenceAcceptance === false && canAccept && !state.mission1Decision.accepted) {
+    state.mission1Decision.accepted = true;
+    state.mission1Decision.acceptedThreshold = threshold;
+    state.mission1Decision.acceptedConfidence = score;
+    if (!state.badgeState.mission1) {
+      state.badgeState.mission1 = true;
+      updateBadges();
+    }
   }
 
   setMission1BadgeText();

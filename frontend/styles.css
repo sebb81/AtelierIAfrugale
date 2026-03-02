@@ -654,6 +654,30 @@ p {
   font-family: inherit;
 }
 
+.rag-file-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.rag-file-item {
+  font-size: 12px;
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.rag-file-item.empty {
+  color: var(--muted);
+  border-style: dashed;
+}
+
 .rag-range {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -900,6 +924,11 @@ canvas {
 .mission-body h3 {
   font-size: 22px;
   margin-bottom: 8px;
+}
+
+#step-body,
+#step-hint {
+  white-space: pre-wrap;
 }
 
 .hint {

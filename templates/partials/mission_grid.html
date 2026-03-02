@@ -66,32 +66,20 @@
       </div>
       <div id="rag-controls" class="rag-controls" hidden>
         <div class="rag-grid">
-          <div class="rag-field">
-            <label for="rag-files">Documents (PDF, TXT, MD)</label>
-            <input id="rag-files" type="file" multiple accept=".pdf,.txt,.md" />
-          </div>
-          <div class="rag-buttons">
-            <button id="rag-index" class="primary" type="button">Indexer</button>
-            <button id="rag-reset" class="ghost" type="button">Reinitialiser base</button>
-          </div>
-          <div class="rag-field">
-            <label for="rag-chunk-size">Taille des chunks</label>
-            <input id="rag-chunk-size" type="number" min="400" max="4000" step="100" value="1200" />
-          </div>
-          <div class="rag-field">
-            <label for="rag-overlap">Chevauchement</label>
-            <input id="rag-overlap" type="number" min="0" max="1000" step="50" value="200" />
-          </div>
-          <div class="rag-field">
+          <div class="rag-field" hidden>
             <label for="rag-top-k">Top-K passages</label>
             <input id="rag-top-k" type="number" min="1" max="20" step="1" value="6" />
           </div>
-          <div class="rag-field">
+          <div class="rag-field" hidden>
             <label for="rag-min-score">Score minimum</label>
             <div class="rag-range">
               <input id="rag-min-score" type="range" min="0" max="1" step="0.01" value="0.25" />
               <span id="rag-min-score-value">0.25</span>
             </div>
+          </div>
+          <div class="rag-field">
+            <label>Fichiers presents dans le RAG</label>
+            <ul id="rag-file-list" class="rag-file-list"></ul>
           </div>
         </div>
         <div id="rag-counts" class="rag-counts">Chunks : 0 · Sources : 0</div>
@@ -101,10 +89,6 @@
         <textarea id="chat-input" rows="2" placeholder="Posez votre question..."></textarea>
         <button id="chat-send" class="primary" type="submit">Envoyer</button>
       </form>
-      <div id="rag-sources" class="rag-sources" hidden>
-        <div class="rag-sources-header">Passages utilises</div>
-        <div id="rag-source-list" class="rag-source-list"></div>
-      </div>
       <p id="chat-status" class="chat-status" hidden></p>
     </div>
     <div id="stage-placeholder" class="stage-placeholder" hidden>
@@ -130,6 +114,10 @@
       <h3 id="step-title"></h3>
       <p id="step-body"></p>
       <p id="step-hint" class="hint"></p>
+      <div id="rag-sources" class="rag-sources" hidden>
+        <div class="rag-sources-header">Passages utilises</div>
+        <div id="rag-source-list" class="rag-source-list"></div>
+      </div>
     </div>
     <div class="mission-challenge" id="challenge-panel">
       <div class="slider-row">
@@ -146,11 +134,11 @@
           <span id="stat-label-status">Reconnaissance</span>
           <strong id="gesture-status">En attente</strong>
         </div>
-        <div class="stat">
+        <div id="best-threshold-stat" class="stat">
           <span id="stat-label-best">Meilleur seuil</span>
           <strong id="best-threshold">0.00</strong>
         </div>
-        <div class="stat">
+        <div id="badge-stat" class="stat">
           <span id="stat-label-badge">Badge</span>
           <strong id="badge-state">Verrouille</strong>
         </div>
@@ -169,7 +157,7 @@
       </div>
     </div>
     <div id="gesture-controls" class="gesture-controls" hidden>
-      <h3>Parametres MediaPipe</h3>
+      <h3>Parametres</h3>
       <div class="control-grid">
         <!-- <div class="control-row select-row">
           <label for="delegate-select">Inference delegate</label>
@@ -185,24 +173,26 @@
           </select>
         </div> -->
         <div class="control-row range-row">
-          <label for="num-hands">Demo num hands</label>
+          <label for="num-hands">Number Hands</label>
           <input id="num-hands" type="range" min="1" max="2" step="1" value="1" />
           <span id="num-hands-value">1</span>
         </div>
-        <div class="control-row range-row">
-          <label for="min-detection">Minimum hand detection confidence</label>
-          <input id="min-detection" type="range" min="0" max="1" step="0.01" value="0.5" />
-          <span id="min-detection-value">50%</span>
-        </div>
-        <div class="control-row range-row">
-          <label for="min-presence">Minimum hand presence confidence</label>
-          <input id="min-presence" type="range" min="0" max="1" step="0.01" value="0.5" />
-          <span id="min-presence-value">50%</span>
-        </div>
-        <div class="control-row range-row">
-          <label for="min-tracking">Minimum tracking confidence</label>
-          <input id="min-tracking" type="range" min="0" max="1" step="0.01" value="0.5" />
-          <span id="min-tracking-value">50%</span>
+        <div id="mp-confidence-controls">
+          <div class="control-row range-row">
+            <label for="min-detection">Minimum hand detection confidence</label>
+            <input id="min-detection" type="range" min="0" max="1" step="0.01" value="0.5" />
+            <span id="min-detection-value">50%</span>
+          </div>
+          <div class="control-row range-row">
+            <label for="min-presence">Minimum hand presence confidence</label>
+            <input id="min-presence" type="range" min="0" max="1" step="0.01" value="0.5" />
+            <span id="min-presence-value">50%</span>
+          </div>
+          <div class="control-row range-row">
+            <label for="min-tracking">Minimum tracking confidence</label>
+            <input id="min-tracking" type="range" min="0" max="1" step="0.01" value="0.5" />
+            <span id="min-tracking-value">50%</span>
+          </div>
         </div>
       </div>
       <p id="config-warning" class="control-warning" hidden></p>

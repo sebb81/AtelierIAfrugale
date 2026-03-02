@@ -3,3 +3,7 @@
 python/
 __pycache__/
 missions/
+llamacpp/
+rag_local.sqlite3
+rag_local.sqlite3-shm
+rag_local.sqlite3-wal

@@ -47,7 +47,28 @@ function updateRagCounts(counts) {
   if (!dom.ragCounts) return;
   const chunks = counts?.chunks ?? 0;
   const sources = counts?.sources ?? 0;
-  dom.ragCounts.textContent = `Chunks : ${chunks} \u00b7 Sources : ${sources}`;
+  const fileLabel = sources > 1 ? "fichiers" : "fichier";
+  dom.ragCounts.textContent = `Chunks : ${chunks} \u00b7 ${sources} ${fileLabel}`;
+}
+
+function renderRagFiles(files) {
+  if (!dom.ragFileList) return;
+  dom.ragFileList.innerHTML = "";
+  if (!files || files.length === 0) {
+    const item = document.createElement("li");
+    item.className = "rag-file-item empty";
+    item.textContent = "Aucun fichier present dans le RAG.";
+    dom.ragFileList.appendChild(item);
+    return;
+  }
+  files.forEach((entry) => {
+    const item = document.createElement("li");
+    item.className = "rag-file-item";
+    const chunks = Number(entry?.chunks || 0);
+    const chunkLabel = chunks > 1 ? "chunks" : "chunk";
+    item.textContent = `${entry?.name || "fichier"} \u00b7 ${chunks} ${chunkLabel}`;
+    dom.ragFileList.appendChild(item);
+  });
 }
 
 function updateMinScoreDisplay() {
@@ -84,61 +105,23 @@ async function fetchRagState() {
   const endpoint = currentPage.ragStateEndpoint || "/api/rag/state";
   try {
     const response = await fetch(endpoint);
-    if (!response.ok) return;
+    if (!response.ok) throw new Error("Impossible de charger l'etat RAG.");
     const data = await response.json();
-    updateRagCounts({ chunks: data?.chunks, sources: data?.sources });
-  } catch (err) {
-    updateRagCounts(null);
-  }
-}
-
-async function resetRagStore() {
-  const endpoint = currentPage.ragResetEndpoint || "/api/rag/reset";
-  setChatStatus(null);
-  try {
-    const response = await fetch(endpoint, { method: "POST" });
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-      throw new Error(data?.detail || "Erreur serveur.");
-    }
-    updateRagCounts({ chunks: 0, sources: 0 });
-    renderSources([]);
-  } catch (err) {
-    setChatStatus(err.message || "Erreur inconnue.");
-  }
-}
-
-async function indexRagDocuments() {
-  if (!dom.ragFiles || !dom.ragFiles.files || dom.ragFiles.files.length === 0) {
-    setChatStatus("Ajoutez des fichiers avant d'indexer.");
-    return;
-  }
-  const endpoint = currentPage.ragIndexEndpoint || "/api/rag/index";
-  const formData = new FormData();
-  Array.from(dom.ragFiles.files).forEach((file) => formData.append("files", file));
-  if (dom.ragChunkSize) formData.append("chunk_size", dom.ragChunkSize.value);
-  if (dom.ragOverlap) formData.append("overlap", dom.ragOverlap.value);
-
-  setChatStatus("Indexation en cours...");
-  setChatBusy(true);
-  try {
-    const response = await fetch(endpoint, { method: "POST", body: formData });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      const detail = data?.detail || "Erreur serveur.";
-      throw new Error(detail);
+    state.ragRuntimeConfig = data?.config || null;
+    if (dom.ragTopK && state.ragRuntimeConfig?.top_k) {
+      dom.ragTopK.value = String(state.ragRuntimeConfig.top_k);
     }
     updateRagCounts({ chunks: data?.chunks, sources: data?.sources });
-    if (data?.errors && data.errors.length) {
+    renderRagFiles(data?.files || []);
+    if (Array.isArray(data?.errors) && data.errors.length) {
       setChatStatus(data.errors.join(" | "));
     } else {
       setChatStatus(null);
     }
-    if (dom.ragFiles) dom.ragFiles.value = "";
   } catch (err) {
+    updateRagCounts(null);
+    renderRagFiles([]);
     setChatStatus(err.message || "Erreur inconnue.");
-  } finally {
-    setChatBusy(false);
   }
 }
 
@@ -158,11 +141,7 @@ async function sendChatMessage(text) {
       messages: state.chatMessages
     };
     if (isRagMode()) {
-      const topK = dom.ragTopK ? Number(dom.ragTopK.value) : 6;
-      const minScore = dom.ragMinScore ? Number(dom.ragMinScore.value) : 0.25;
       payload.query = text;
-      payload.top_k = topK;
-      payload.min_score = minScore;
     }
     const response = await fetch(endpoint, {
       method: "POST",
@@ -183,7 +162,9 @@ async function sendChatMessage(text) {
     addMessage("assistant", reply);
 
     if (isRagMode()) {
+      state.ragLastRetrieval = data?.retrieval || null;
       renderSources(data?.sources || []);
+      setChatStatus(null);
       if (!state.badgeState.mission4) {
         state.badgeState.mission4 = true;
         updateBadges();
@@ -226,8 +207,9 @@ export function setupChat() {
     dom.chatInput.placeholder = currentPage.chatPlaceholder;
   }
   if (isRagMode() && currentPage.ragConfig) {
-    if (dom.ragChunkSize) dom.ragChunkSize.value = currentPage.ragConfig.chunkSize;
-    if (dom.ragOverlap) dom.ragOverlap.value = currentPage.ragConfig.overlap;
+    state.ragRuntimeConfig = {
+      top_k: currentPage.ragConfig.topK
+    };
     if (dom.ragTopK) dom.ragTopK.value = currentPage.ragConfig.topK;
     if (dom.ragMinScore) dom.ragMinScore.value = currentPage.ragConfig.minScore;
     updateMinScoreDisplay();
@@ -249,6 +231,7 @@ export function setupChat() {
   if (dom.chatClear) {
     dom.chatClear.addEventListener("click", () => {
       state.chatMessages = [];
+      state.ragLastRetrieval = null;
       renderMessages();
       setChatStatus(null);
       renderSources([]);
@@ -257,12 +240,6 @@ export function setupChat() {
   if (isRagMode()) {
     if (dom.ragMinScore) {
       dom.ragMinScore.addEventListener("input", () => updateMinScoreDisplay());
-    }
-    if (dom.ragIndex) {
-      dom.ragIndex.addEventListener("click", () => indexRagDocuments());
-    }
-    if (dom.ragReset) {
-      dom.ragReset.addEventListener("click", () => resetRagStore());
     }
   }
 }

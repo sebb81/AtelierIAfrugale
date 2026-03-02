@@ -38,5 +38,7 @@ export const state = {
   wsRef: null,
   chatMessages: [],
   chatBusy: false,
-  audioAttempts: []
+  audioAttempts: [],
+  ragRuntimeConfig: null,
+  ragLastRetrieval: null
 };
