@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Opus Cinema - Final Fix</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Courier New', monospace; }
+        
+        /* 1. LA WEBCAM (Au fond) */
+        #input_video {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+            z-index: 0;
+            /* On s'assure qu'elle est bien visible */
+            display: block; 
+            opacity: 1;
+        }
+
+        /* 2. LE CANVAS 3D (Au dessus) */
+        #canvas-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            /* L'ASTUCE MAGIQUE ICI : */
+            /* "screen" rend le noir transparent et garde la lumière */
+            mix-blend-mode: screen; 
+        }
+
+        #ui {
+            position: absolute;
+            bottom: 30px; left: 30px;
+            color: #00ffff;
+            z-index: 2;
+            font-weight: bold;
+            text-shadow: 2px 2px 0px #000;
+        }
+        .instruction { font-size: 20px; margin-bottom: 5px; background: rgba(0,0,0,0.5); padding: 5px; display: inline-block;}
+    </style>
+
+    <!-- MediaPipe -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    
+    <!-- Three.js Imports -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.136.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.136.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <!-- Élément vidéo standard -->
+    <video id="input_video" autoplay playsinline></video>
+    
+    <div id="canvas-container"></div>
+
+    <div id="ui">
+        <div class="instruction">✋ 5 Doigts : CRTHON</div>
+        <div class="instruction">✌️ 2 Doigts : BRETAGNE</div>
+        <div class="instruction">👐 2 Mains : ORBE</div>
+        <div style="font-size: 12px; color: #aaa; margin-top:10px;">Status: <span id="status">INIT...</span></div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+        // --- CONFIG ---
+        const PARTICLE_COUNT = 5000;
+        const PARTICLE_SIZE = 8;
+        
+        let scene, camera, renderer, composer;
+        let particles, geometry;
+        let currentMode = "IDLE"; 
+        let handCenter = { x: 0, y: 0 }; 
+        let time = 0;
+
+        initThree();
+
+        function initThree() {
+            const container = document.getElementById('canvas-container');
+            
+            scene = new THREE.Scene();
+            // On s'assure que la scène n'a pas de couleur de fond (laisse le CSS gérer)
+            scene.background = null; 
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 4000);
+            camera.position.z = 800;
+
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            // Fond noir pur (0x000000) mais alpha 0. 
+            // Avec le mix-blend-mode CSS, le noir deviendra transparent.
+            renderer.setClearColor(0x000000, 0); 
+            container.appendChild(renderer.domElement);
+
+            // POST-PROCESSING
+            const renderScene = new RenderPass(scene, camera);
+            
+            const bloomPass = new UnrealBloomPass(
+                new THREE.Vector2(window.innerWidth, window.innerHeight), 
+                2.0, // Force du glow
+                0.5, // Rayon
+                0.0  // Seuil
+            );
+
+            composer = new EffectComposer(renderer);
+            composer.addPass(renderScene);
+            composer.addPass(bloomPass);
+
+            // PARTICULES
+            geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(PARTICLE_COUNT * 3);
+            
+            for (let i = 0; i < PARTICLE_COUNT * 3; i++) {
+                positions[i] = (Math.random() - 0.5) * 2000;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.userData = { targets: [], sphereOffsets: [] };
+
+            // Sphère data
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos((Math.random() * 2) - 1);
+                const r = 300; 
+                geometry.userData.sphereOffsets.push({
+                    x: r * Math.sin(phi) * Math.cos(theta),
+                    y: r * Math.sin(phi) * Math.sin(theta),
+                    z: r * Math.cos(phi)
+                });
+            }
+
+            const material = new THREE.PointsMaterial({
+                color: 0x00ffff,
+                size: PARTICLE_SIZE,
+                blending: THREE.AdditiveBlending,
+                transparent: true,
+                opacity: 0.9
+            });
+
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+
+            transformText("PRET");
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.02;
+
+            const positions = geometry.attributes.position.array;
+            const targets = geometry.userData.targets;
+            const sphereOffsets = geometry.userData.sphereOffsets;
+
+            particles.rotation.set(0,0,0);
+
+            if (currentMode === "BALL") {
+                const pulse = 1 + Math.sin(time * 4) * 0.1;
+                const rotSpeed = time * 2.5;
+
+                for (let i = 0; i < PARTICLE_COUNT; i++) {
+                    const ix = i * 3;
+                    const ox = sphereOffsets[i].x; const oy = sphereOffsets[i].y; const oz = sphereOffsets[i].z;
+                    const rx = ox * Math.cos(rotSpeed) - oz * Math.sin(rotSpeed);
+                    const rz = ox * Math.sin(rotSpeed) + oz * Math.cos(rotSpeed);
+                    
+                    const jitter = (Math.random() - 0.5) * 15;
+                    const tx = handCenter.x + (rx * pulse) + jitter;
+                    const ty = handCenter.y + (oy * pulse) + jitter;
+                    const tz = (rz * pulse) + jitter;
+
+                    positions[ix] += (tx - positions[ix]) * 0.15;
+                    positions[ix+1] += (ty - positions[ix+1]) * 0.15;
+                    positions[ix+2] += (tz - positions[ix+2]) * 0.15;
+                }
+            } else {
+                const floatY = Math.sin(time * 1.5) * 20;
+                if (targets.length > 0) {
+                    for (let i = 0; i < PARTICLE_COUNT; i++) {
+                        const target = targets[i] || targets[0];
+                        const ix = i * 3;
+                        const tx = target.x; const ty = target.y + floatY; const tz = target.z;
+                        positions[ix] += (tx - positions[ix]) * 0.1;
+                        positions[ix+1] += (ty - positions[ix+1]) * 0.1;
+                        positions[ix+2] += (tz - positions[ix+2]) * 0.1;
+                    }
+                }
+            }
+
+            geometry.attributes.position.needsUpdate = true;
+            composer.render();
+        }
+
+        function transformText(text) {
+            currentMode = "TEXT";
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 1400; canvas.height = 600;
+            
+            ctx.fillStyle = 'black'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '900 200px Arial';
+            ctx.fillStyle = 'white'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            const newTargets = [];
+
+            for (let y = 0; y < canvas.height; y += 6) {
+                for (let x = 0; x < canvas.width; x += 6) {
+                    if (data[((y * canvas.width + x) * 4)] > 128) {
+                        newTargets.push({
+                            x: (x - canvas.width / 2) * 2.0,
+                            y: -(y - canvas.height / 2) * 2.0,
+                            z: 0
+                        });
+                    }
+                }
+            }
+
+            const totalTargets = [];
+            for(let i=0; i<PARTICLE_COUNT; i++) {
+                if(i < newTargets.length) {
+                    totalTargets.push(newTargets[i]);
+                } else {
+                    const angle = Math.random() * Math.PI * 2;
+                    const rad = 1000 + Math.random() * 500;
+                    totalTargets.push({
+                        x: Math.cos(angle) * rad,
+                        y: (Math.random()-0.5) * 800,
+                        z: Math.sin(angle) * rad
+                    });
+                }
+            }
+            totalTargets.sort(() => Math.random() - 0.5);
+            geometry.userData.targets = totalTargets;
+        }
+
+        // --- MEDIAPIPE ---
+        const videoElement = document.getElementById('input_video');
+        const statusElement = document.getElementById('status');
+
+        function onResults(results) {
+            const handsData = results.multiHandLandmarks;
+
+            if (handsData && handsData.length === 2) {
+                if (currentMode !== "BALL") {
+                    currentMode = "BALL";
+                    statusElement.innerText = "ORBE";
+                    particles.material.color.setHex(0xffaa00);
+                    particles.material.size = 12;
+                }
+                const h1 = handsData[0][9]; const h2 = handsData[1][9];
+                handCenter.x = -((h1.x + h2.x)/2 - 0.5) * 3000;
+                handCenter.y = -((h1.y + h2.y)/2 - 0.5) * 2000;
+
+            } else if (handsData && handsData.length === 1) {
+                if (currentMode === "BALL") {
+                    particles.material.color.setHex(0x00ffff);
+                    particles.material.size = PARTICLE_SIZE;
+                }
+                const fingers = countFingers(handsData[0]);
+                let text = "";
+                if (fingers === 5) text = "CRTHON";
+                else if (fingers === 2) text = "BRETAGNE";
+                else if (fingers === 0) text = "OPUS";
+
+                if (text && text !== geometry.userData.lastText) {
+                    geometry.userData.lastText = text;
+                    statusElement.innerText = text;
+                    transformText(text);
+                }
+            }
+        }
+
+        function countFingers(landmarks) {
+            let count = 0;
+            const tips = [8, 12, 16, 20]; const pips = [6, 10, 14, 18];
+            for (let i = 0; i < 4; i++) { if (landmarks[tips[i]].y < landmarks[pips[i]].y) count++; }
+            if (Math.abs(landmarks[4].x - landmarks[0].x) > Math.abs(landmarks[3].x - landmarks[0].x)) count++;
+            return count;
+        }
+
+        const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+        hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+        hands.onResults(onResults);
+
+        const cameraUtils = new Camera(videoElement, {
+            onFrame: async () => { await hands.send({image: videoElement}); },
+            width: 1280, height: 720
+        });
+        
+        // Démarrage avec gestion d'erreur
+        cameraUtils.start()
+            .then(() => { statusElement.innerText = "Caméra OK"; })
+            .catch(err => { 
+                statusElement.innerText = "ERREUR CAMERA"; 
+                alert("Erreur webcam: Vérifiez que vous êtes en HTTPS ou localhost");
+            });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
